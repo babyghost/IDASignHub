@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head th:replace="fragments/head/head::head"></head>
+<body class="hold-transition skin-blue sidebar-mini">
+	<div class="wrapper">
+		<header th:insert="./fragments/nav/header::nav"></header>
+		<!-- Left side column. contains the logo and sidebar -->
+		<aside th:insert="fragments/sidebar/sidebar::sidebar"></aside>
+		<!-- Content Wrapper. Contains page content -->
+		<div class="content-wrapper">
+			<!-- Content Header (Page header) -->
+			<section th:insert="fragments/breadcrumb/breadcrumb::breadcrumb"></section>
+			<!-- Main content -->
+			<section class="content">
+				<!-- Info boxes -->
+				<div class="row">
+					<div class="col-md-12 col-sm-12 col-xs-12">
+						<h3>TOOL HỖ TRỢ KÝ SỐ</h3>
+						<!-- /.info-box -->
+					</div>
+					<!-- /.col -->
+				</div>
+				<div class="row" style="min-height: 70vh;">
+					<div class="col-md-3 col-sm-6 col-xs-12">
+						<div class="info-box btn_kySoFolderModal">
+							<span class="info-box-icon bg-aqua"><i
+									class="fa fa-folder"></i></span>
+							<div class="info-box-content">
+								<span class="info-box-text" style="font-weight: 600">KÝ SỐ FOLDER</span>
+								<p style="font-size: 12px">Tool sẽ tự động ký số tất cả các file trong folder người dùng tải lên</p>
+							</div>
+							<!-- /.info-box-content -->
+						</div>
+						<!-- /.info-box -->
+					</div>
+<!--					<div class="col-md-3 col-sm-6 col-xs-12">-->
+<!--						<div class="info-box btn_kySoZipModal">-->
+<!--							<span class="info-box-icon bg-aqua"><i-->
+<!--									class="fa fa-archive"></i></span>-->
+<!--							<div class="info-box-content ">-->
+<!--								<span class="info-box-text" style="font-weight: 600">KÝ SỐ (ZIP)</span>-->
+<!--								<p style="font-size: 12px">Tool sẽ tự động ký số tất cả các file trong file zip người dùng tải lên</p>-->
+<!--							</div>-->
+<!--							&lt;!&ndash; /.info-box-content &ndash;&gt;-->
+<!--						</div>-->
+<!--						&lt;!&ndash; /.info-box &ndash;&gt;-->
+<!--					</div>-->
+<!--					<div class="col-md-3 col-sm-6 col-xs-12">-->
+<!--						<div class="info-box btn_kySoZipModal">-->
+<!--							<span class="info-box-icon bg-aqua"><i-->
+<!--									class="fa fa-file-pdf-o"></i></span>-->
+<!--							<div class="info-box-content">-->
+<!--								<span class="info-box-text" style="font-weight: 600">KÝ SỐ FILE PDF</span>-->
+<!--								<p style="font-size: 12px">Tool sẽ ký số file PDF người dùng tải lên</p>-->
+<!--							</div>-->
+<!--							&lt;!&ndash; /.info-box-content &ndash;&gt;-->
+<!--						</div>-->
+<!--						&lt;!&ndash; /.info-box &ndash;&gt;-->
+<!--					</div>-->
+<!--					<div class="col-md-3 col-sm-6 col-xs-12">-->
+<!--						<div class="info-box btn_TaoPDF2Lop">-->
+<!--							<span class="info-box-icon bg-aqua"><i-->
+<!--									class="fa fa-file-pdf-o"></i></span>-->
+<!--							<div class="info-box-content">-->
+<!--								<span class="info-box-text" style="font-weight: 600">TẠO PDF 2 lớp</span>-->
+<!--								<p style="font-size: 12px">Tool tạo PDF 2 lớp (Demo)</p>-->
+<!--							</div>-->
+<!--							&lt;!&ndash; /.info-box-content &ndash;&gt;-->
+<!--						</div>-->
+<!--						&lt;!&ndash; /.info-box &ndash;&gt;-->
+<!--					</div>-->
+				</div>
+				<!-- /.row -->
+			</section>
+			<!-- /.content -->
+			<div th:include="fragments/modal/kysofolder::kyso_folder"></div>
+		</div>
+		<!-- /.content-wrapper -->
+		<footer th:insert="fragments/footer/footer::footer"></footer>
+		<!-- Control Sidebar -->
+		<aside th:insert="fragments/control_sidebar/sidebar::control_sidebar"></aside>
+		<!-- /.control-sidebar -->
+		<!-- Add the sidebar's background. This div must be placed
+  immediately after the control sidebar -->
+		<div class="control-sidebar-bg"></div>
+	</div>
+	<!-- ./wrapper -->
+	<div th:replace="fragments/footer/footer::load_js_css_dashboard"></div>
+</body>
+</html>

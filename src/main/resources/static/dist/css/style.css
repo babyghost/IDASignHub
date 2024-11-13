@@ -1,0 +1,18 @@
+/*UPLOAD FILE STYLE*/
+label.fileContainer {
+    padding: 5px 16px;
+    background: #37eda7;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.modal-backdrop {
+    display: none;
+}
+form#form-import-dulieu:after {
+    clear: both;
+    display: block;
+    content: "";
+}
+.info-box:hover {
+    cursor: pointer;
+}

@@ -1,0 +1,115 @@
+<div th:fragment="kyso_folder">
+  <!--Popup-->
+  <!-- Modal Structure -->
+  <div id="kySoZipModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <!-- form start -->
+      <form role="form" method="post" action="#" id="form_kyso_zip" enctype="multipart/form-data">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+            <h4 class="modal-title">Ký số file</h4>
+          </div>
+          <div class="modal-body">
+            <div class="box-body">
+              <div class="box box-primary">
+                <div class="box-header with-border">
+                  <h3 class="box-title">Upload file zip</h3>
+                </div>
+                <div class="box-body">
+                  <div class="form-group">
+                    <div class="row">
+                      <div class="col-md-6 col-sm-6 col-xs-12" style="padding-top: 20px;padding-bottom: 20px;padding-left: 10px;">
+                        <input name="file_zip" type="file" class="form-control" id="file_zip">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="box box-primary">
+                <div class="box-header with-border">
+                  <h3 class="box-title">Cấu hình ký số được áp dụng</h3>
+                </div>
+                <div class="box-body">
+                  <div class="form-group">
+                    <div class="row">
+                      <div class="col-md-6 col-sm-6 col-xs-12">
+                        <label for="mau_kyso_zip">Mẫu ký số đang áp dụng: </label>
+                        <select id="mau_kyso_zip" name="mau_kyso_zip" class="form-control">
+                          <option value="0">Mẫu ký số được áp dụng</option>
+                        </select>
+                      </div>
+                      <div class="col-md-6 col-sm-6 col-xs-12 mau_ky_img_zip"></div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-12 col-sm-12 col-xs-12">
+                        <div class="thongtin_maukyso_zip">
+                          <div class="checkbox">
+                            <label for="thongtin_hienthi_zip"><b>Hiển thị: </b></label><br/>
+                            <label>
+                              <input id="thongtin_hienthi_zip" type="radio" name="thongtin_hienthi_zip" class="thongtin_hienthi_zip" value="HINHANH_THONGTIN"> Hình ảnh và thông tin
+                            </label>
+                            <label>
+                              <input type="radio" name="thongtin_hienthi_zip" class="thongtin_hienthi_zip" value="HINHANH"> Hình ảnh
+                            </label>
+                            <label>
+                              <input type="radio" name="thongtin_hienthi_zip" class="thongtin_hienthi_zip" value="THONGTIN"> Thông tin
+                            </label>
+                          </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                          <div class="form-group">
+                            <label for="kysotaitrang_zip">Ký tại trang số: </label> <input
+                                  name="kysotaitrang_zip" type="text" class="form-control" id="kysotaitrang_zip"
+                                  placeholder="Nhập trang số ...">
+                          </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                          <div class="form-group">
+                            <label for="vitri_trentrang_zip">Vị trí trên trang: </label>
+                            <select id="vitri_trentrang_zip" name="vitri_trentrang" class="form-control">
+                              <option value="tren_trai">Trên, góc trái</option>
+                              <option value="tren_phai">Trên, góc phải</option>
+                              <option value="duoi_trai">Dưới, góc trái</option>
+                              <option value="duoi_phai">Dưới, góc phải</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="row">
+                      <div class="col-md-4 col-sm-6 col-xs-12">
+                        <label>
+                          <input type="radio" name="loai_kyso_zip" value="KY_SAOLUC"> Ký số sao lục
+                        </label>
+                      </div>
+                      <div class="col-md-4 col-sm-6 col-xs-12">
+                        <label>
+                          <input type="radio" name="loai_kyso_zip" value="KY_TRICKSAO"> Ký số trích sao
+                        </label>
+                      </div>
+                      <div class="col-md-4 col-sm-6 col-xs-12">
+                        <label>
+                          <input type="radio" name="loai_kyso_zip" value="KY_SAOY"> Ký số sao y
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- /.box-body -->
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
+            <button type="button" class="btn btn-primary btn-kyso-zip">Ký</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </form>
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+</div>

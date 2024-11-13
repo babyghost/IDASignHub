@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/head/head::head"></head>
+<body class="hold-transition skin-blue sidebar-mini">
+	<div class="wrapper">
+		<header th:insert="./fragments/nav/header::nav"></header>
+		<!-- Left side column. contains the logo and sidebar -->
+		<aside th:insert="fragments/sidebar/sidebar::sidebar"></aside>
+		<!-- Content Wrapper. Contains page content -->
+		<div class="content-wrapper">
+			<!-- Content Header (Page header) -->
+			<section th:insert="fragments/breadcrumb/breadcrumb::breadcrumb"></section>
+			<!-- Main content -->
+			<section class="content">
+				<!-- Info boxes -->
+				<div class="row">
+					<div class="col-md-12 col-sm-12 col-xs-12">
+						<h3>CẤU HÌNH MẪU KÝ SỐ</h3>
+						<!-- /.info-box -->
+					</div>
+					<!-- /.col -->
+				</div>
+				<div class="row" style="min-height: 70vh;">
+					<div class="col-md-12">
+						<div class="nav-tabs-custom">
+							<ul class="nav nav-tabs">
+								<li class="active"><a href="#activity" data-toggle="tab">Cấu hình</a></li>
+							</ul>
+							<div class="tab-content">
+								<div class="active tab-pane" id="activity">
+									<div class="row">
+										<div class="col-md-12">
+											<button type="button" class="btn btn-primary" id="btnThemMauChuKy" data-toggle="modal" data-target="#exampleModal" style="margin-bottom: 10px;">
+												Thêm mới mẫu chữ ký
+											</button>
+											<table class="table table-bordered">
+												<thead>
+												<tr>
+													<th>Tên mẫu</th>
+													<th>Hình ảnh chữ ký</th>
+													<th>Kiểu chữ ký</th>
+													<th>Trạng thái hoạt động</th>
+												</tr>
+												</thead>
+												<tbody id="signatureTableBody">
+												<!-- AJAX sẽ chèn dữ liệu vào đây -->
+												</tbody>
+											</table>
+										</div>
+									</div>
+									<!--Popup-->
+									<!-- Modal Structure -->
+									<div id="themMoiMauChuKyClass" class="modal fade" tabindex="-1" role="dialog">
+										<div class="modal-dialog" role="document">
+											<!-- form start -->
+											<form role="form" method="post" action="/saveSignType" enctype="multipart/form-data">
+											<div class="modal-content">
+												<div class="modal-header">
+													<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+														<span aria-hidden="true">&times;</span>
+													</button>
+													<h4 class="modal-title">Thêm mới mẫu</h4>
+												</div>
+												<div class="modal-body">
+														<div class="box-body">
+															<div class="form-group">
+																<label for="maukyso">Tên mẫu: </label> <input
+																	name="maukyso" type="text" class="form-control" id="maukyso"
+																	placeholder="Nhập tên mẫu">
+															</div>
+															<div class="form-group">
+																<label for="signImage">Hình ảnh chữ ký hoặc con dấu cơ quan: </label> <input
+																	name="signImage" type="file" id="signImage">
+																<p class="help-block">Dùng để thể hiện chữ ký cá nhân hoặc con dấu cơ quan</p>
+															</div>
+															<div class="checkbox">
+																<label for="thongtin_hienthi"><b>Hiển thị: </b></label><br/>
+																<label>
+																	<input id="thongtin_hienthi" type="radio" name="thongtin_hienthi" value="HINHANH_THONGTIN"> Hình ảnh và thông tin
+																</label>
+																<label>
+																	<input type="radio" name="thongtin_hienthi" value="HINHANH"> Hình ảnh
+																</label>
+																<label>
+																	<input type="radio" name="thongtin_hienthi" value="THONGTIN"> Thông tin
+																</label>
+															</div>
+															<div class="form-group">
+																<label for="trang">Ký tại trang số: </label> <input
+																	name="trang" type="text" class="form-control" id="trang"
+																	placeholder="Nhập trang số ...">
+															</div>
+															<div class="form-group">
+																<label for="vitri_trentrang">Vị trí trên trang: </label>
+																<select id="vitri_trentrang" name="vitri_trentrang" class="form-control">
+																	<option value="tren_trai">Trên, góc trái</option>
+																	<option value="tren_phai">Trên, góc phải</option>
+																	<option value="duoi_trai">Dưới, góc trái</option>
+																	<option value="duoi_phai">Dưới, góc phải</option>
+																</select>
+															</div>
+														</div>
+														<!-- /.box-body -->
+												</div>
+												<div class="modal-footer">
+													<button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
+													<button type="submit" class="btn btn-primary">Lưu cấu hình</button>
+												</div>
+											</div><!-- /.modal-content -->
+											</form>
+										</div><!-- /.modal-dialog -->
+									</div><!-- /.modal -->
+								</div>
+								<!-- /.tab-pane -->
+							</div>
+							<!-- /.tab-content -->
+						</div>
+						<!-- /.nav-tabs-custom -->
+					</div>
+					<!-- /.col -->
+				</div>
+				<!-- /.row -->
+			</section>
+			<!-- /.content -->
+		</div>
+		<!-- /.content-wrapper -->
+		<footer th:insert="fragments/footer/footer::footer"></footer>
+		<!-- Control Sidebar -->
+		<aside th:insert="fragments/control_sidebar/sidebar::control_sidebar"></aside>
+		<!-- /.control-sidebar -->
+		<!-- Add the sidebar's background. This div must be placed
+  immediately after the control sidebar -->
+		<div class="control-sidebar-bg"></div>
+	</div>
+	<!-- ./wrapper -->
+	<div th:replace="fragments/footer/footer::load_js_css"></div>
+</body>
+</html>
