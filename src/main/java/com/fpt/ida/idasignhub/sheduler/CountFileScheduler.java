@@ -49,7 +49,7 @@ public class CountFileScheduler {
 
     private static final Path rootLocation = Paths.get("filestorage_thongke");
 
-    @Scheduled(fixedDelay = 2 * 60 * 1000)
+//    @Scheduled(fixedDelay = 2 * 60 * 1000)
     public void countFilePDFFromFolder() throws IOException {
         System.out.println("Starting scheduled Count PDF page file...");
         List<FileEntry> downloadedFiles = new ArrayList<>();

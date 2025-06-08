@@ -101,87 +101,61 @@ public class HubController {
                                @RequestParam("signImage") MultipartFile signImage) throws IOException {
 
         // bước 1 lưu file signImage vào folder chứa ảnh.
-//        String pathFile = "";
         String base64File = "";
         if(!signImage.isEmpty()) {
-//            String ext  = FilenameUtils.getExtension(signImage.getOriginalFilename());
-//            UUID uuid = UUID.randomUUID();
-//            String randomUUIDString = uuid.toString();
-//            String file_tmp = randomUUIDString + "." + ext;
-//            String filePath = Paths.get(ConstantUtil.IDA_CONFIG_FOLDER, file_tmp).toString();
-//            BufferedOutputStream stream = null;
-//            stream = new BufferedOutputStream(new FileOutputStream(new File(filePath)));
-//            stream.write(signImage.getBytes());
-//            stream.close();
-//            pathFile = filePath;
-
             byte[] imageBytes = SignHubLocalUtill.convertInputStreamToByteArray(signImage.getInputStream());
             // Chuyển đổi mảng byte thành chuỗi Base64
             base64File = Base64.getEncoder().encodeToString(imageBytes);
         }
-
         SignHubLocal op = SignHubLocalUtill.saveCofig(vitri_trentrang, maukyso, trang, base64File, thongtin_hienthi);
-
         return "redirect:/cau-hinh-ky-so";
     }
-//    @MessageMapping("/hello")
-//    @SendTo("/listener/re-hello")
-//    public ResponseEntity<String> helloworld() {
-//        return ResponseEntity.ok("Hello world ..");
-//    }
+//    @MessageMapping("/signPDF")
+//    @SendTo("/listener/signPDFResponse")
+//    public ResponseEntity<JSONObject> signPDFResponse(SignDataRequest param) throws KeyStoreException, UnrecoverableKeyException, NoSuchAlgorithmException, IOException {
+//        // Code giả lập config
+//        ConfigSignature configExample = new ConfigSignature();
+//        configExample.setCoutryLocation("VN");
+//        configExample.setHeightSignature(50);
+//        configExample.setWidthSignature(150);
+//        configExample.setFontSizeSignature(7);
+//        configExample.setReasonSign("Sign PDF");
+//        configExample.setImgSignBase64(null);
+//        configExample.setxLocation(480); // quy dinh ky so sao y la goc phai tren cung
+//        configExample.setyLocation(740); // quy dinh ky so sao y la goc phai tren cung
+//        configExample.setPageSign(configExample.getPageSign());
+//        configExample.setCryptoStandard("CMS");
+//        configExample.setTimeStampServer(ConstantUtil.IDA_BANCOYEU_TIMESTAMP_URL);
+//        ShowSignature showSignature = new ShowSignature();
+//        showSignature.setShowType(0);
+//        showSignature.setShowInfoExtends("INFOLABEL_EMAIL_ORGANIZATION_TIMESTAMP");
+//        configExample.setShowSignature(showSignature);
+//        configExample.setSignatureType("KY_SAOY");
+//        //End code giả lập config
+//        // giả lập nguồn pdf
+//        String input = ConstantUtil.IDA_TEST_INPUT_FILE;
+//        //End giả lập
+//        // giả lập output.
+//        String output = ConstantUtil.IDA_TEST_OUTPUT_FILE;
+//        // End giả lập output
+//        String alias = null;
+//        try {
+//            KeyStore keyStore = SignHub.loadUsbToken();
+//            // Lấy khóa riêng từ KeyStore
+//            alias = SignHub.getAliasByKeyStore(keyStore);
+//            System.out.println("alias: " + alias);
+//            if (Objects.nonNull(alias)) {
+//                SignHub.signPDF(keyStore, alias, input, output, configExample);
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
 //
-//    @MessageMapping("/signPDFs")
-//    @SendTo("/listener/signPDFFromZipFolder")
-//    public ResponseEntity<JSONObject> signPDFFromZipFolder() {
-//        return null;
+//        JSONObject rep = new JSONObject();
+//        rep.put("status", 200);
+//        rep.put("message", "Thành công");
+//        rep.put("data", param);
+//        return ResponseEntity.ok((JSONObject) rep);
 //    }
-
-    @MessageMapping("/signPDF")
-    @SendTo("/listener/signPDFResponse")
-    public ResponseEntity<JSONObject> signPDFResponse(SignDataRequest param) throws KeyStoreException, UnrecoverableKeyException, NoSuchAlgorithmException, IOException {
-        // Code giả lập config
-        ConfigSignature configExample = new ConfigSignature();
-        configExample.setCoutryLocation("VN");
-        configExample.setHeightSignature(50);
-        configExample.setWidthSignature(150);
-        configExample.setFontSizeSignature(7);
-        configExample.setReasonSign("Sign PDF");
-        configExample.setImgSignBase64(null);
-        configExample.setxLocation(480); // quy dinh ky so sao y la goc phai tren cung
-        configExample.setyLocation(740); // quy dinh ky so sao y la goc phai tren cung
-        configExample.setPageSign(configExample.getPageSign());
-        configExample.setCryptoStandard("CMS");
-        configExample.setTimeStampServer(ConstantUtil.IDA_BANCOYEU_TIMESTAMP_URL);
-        ShowSignature showSignature = new ShowSignature();
-        showSignature.setShowType(0);
-        showSignature.setShowInfoExtends("INFOLABEL_EMAIL_ORGANIZATION_TIMESTAMP");
-        configExample.setShowSignature(showSignature);
-        configExample.setSignatureType("KY_SAOY");
-        //End code giả lập config
-        // giả lập nguồn pdf
-        String input = ConstantUtil.IDA_TEST_INPUT_FILE;
-        //End giả lập
-        // giả lập output.
-        String output = ConstantUtil.IDA_TEST_OUTPUT_FILE;
-        // End giả lập output
-        String alias = null;
-        try {
-            KeyStore keyStore = SignHub.loadUsbToken();
-            // Lấy khóa riêng từ KeyStore
-            alias = SignHub.getAliasByKeyStore(keyStore);
-            System.out.println("alias: " + alias);
-            if (Objects.nonNull(alias)) {
-                SignHub.signPDF(keyStore, alias, input, output, configExample);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        JSONObject rep = new JSONObject();
-        rep.put("status", 200);
-        rep.put("message", "Thành công");
-        rep.put("data", param);
-        return ResponseEntity.ok((JSONObject) rep);
-    }
 
 }

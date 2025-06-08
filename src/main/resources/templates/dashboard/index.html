@@ -11,7 +11,7 @@
 			<!-- Content Header (Page header) -->
 			<section th:insert="fragments/breadcrumb/breadcrumb::breadcrumb"></section>
 			<!-- Main content -->
-			<section class="content">
+			<section class="content" style="min-height: 70vh;">
 				<!-- Info boxes -->
 				<div class="row">
 					<div class="col-md-12 col-sm-12 col-xs-12">
@@ -20,7 +20,7 @@
 					</div>
 					<!-- /.col -->
 				</div>
-				<div class="row" style="min-height: 70vh;">
+				<div class="row">
 					<div class="col-md-3 col-sm-6 col-xs-12">
 						<div class="info-box btn_kySoFolderModal">
 							<span class="info-box-icon bg-aqua"><i
@@ -33,47 +33,175 @@
 						</div>
 						<!-- /.info-box -->
 					</div>
-<!--					<div class="col-md-3 col-sm-6 col-xs-12">-->
-<!--						<div class="info-box btn_kySoZipModal">-->
-<!--							<span class="info-box-icon bg-aqua"><i-->
-<!--									class="fa fa-archive"></i></span>-->
-<!--							<div class="info-box-content ">-->
-<!--								<span class="info-box-text" style="font-weight: 600">KÝ SỐ (ZIP)</span>-->
-<!--								<p style="font-size: 12px">Tool sẽ tự động ký số tất cả các file trong file zip người dùng tải lên</p>-->
-<!--							</div>-->
-<!--							&lt;!&ndash; /.info-box-content &ndash;&gt;-->
-<!--						</div>-->
-<!--						&lt;!&ndash; /.info-box &ndash;&gt;-->
-<!--					</div>-->
-<!--					<div class="col-md-3 col-sm-6 col-xs-12">-->
-<!--						<div class="info-box btn_kySoZipModal">-->
-<!--							<span class="info-box-icon bg-aqua"><i-->
-<!--									class="fa fa-file-pdf-o"></i></span>-->
-<!--							<div class="info-box-content">-->
-<!--								<span class="info-box-text" style="font-weight: 600">KÝ SỐ FILE PDF</span>-->
-<!--								<p style="font-size: 12px">Tool sẽ ký số file PDF người dùng tải lên</p>-->
-<!--							</div>-->
-<!--							&lt;!&ndash; /.info-box-content &ndash;&gt;-->
-<!--						</div>-->
-<!--						&lt;!&ndash; /.info-box &ndash;&gt;-->
-<!--					</div>-->
-<!--					<div class="col-md-3 col-sm-6 col-xs-12">-->
-<!--						<div class="info-box btn_TaoPDF2Lop">-->
-<!--							<span class="info-box-icon bg-aqua"><i-->
-<!--									class="fa fa-file-pdf-o"></i></span>-->
-<!--							<div class="info-box-content">-->
-<!--								<span class="info-box-text" style="font-weight: 600">TẠO PDF 2 lớp</span>-->
-<!--								<p style="font-size: 12px">Tool tạo PDF 2 lớp (Demo)</p>-->
-<!--							</div>-->
-<!--							&lt;!&ndash; /.info-box-content &ndash;&gt;-->
-<!--						</div>-->
-<!--						&lt;!&ndash; /.info-box &ndash;&gt;-->
-<!--					</div>-->
+					<div class="col-md-3 col-sm-6 col-xs-12">
+						<div class="info-box btn_KichHoatKySo">
+							<span class="info-box-icon bg-aqua"><i
+									class="fa fa-folder"></i></span>
+							<div class="info-box-content">
+								<span class="info-box-text" style="font-weight: 600">Ký số auto</span>
+								<p style="font-size: 12px">Tool sẽ tự động ký số tất cả các file trong folder mặc định</p>
+							</div>
+							<!-- /.info-box-content -->
+						</div>
+						<!-- /.info-box -->
+					</div>
+					<div class="col-md-3 col-sm-6 col-xs-12">
+						<div class="info-box btn_kySoFolderAutoModal">
+							<span class="info-box-icon bg-aqua"><i
+									class="fa fa-folder"></i></span>
+							<div class="info-box-content">
+								<span class="info-box-text" style="font-weight: 600">Ký số auto folder</span>
+								<p style="font-size: 12px">Tool sẽ tự động ký số tất cả các file trong path folder được cung cấp</p>
+							</div>
+							<!-- /.info-box-content -->
+						</div>
+						<!-- /.info-box -->
+					</div>
+					<div class="col-md-3 col-sm-6 col-xs-12">
+						<div class="info-box btn_KichHoatNenPDF">
+							<span class="info-box-icon bg-aqua"><i
+									class="fa fa-folder"></i></span>
+							<div class="info-box-content">
+								<span class="info-box-text" style="font-weight: 600">Nén file PDF</span>
+								<p style="font-size: 12px">Tool sẽ tự động optimize file pdf</p>
+							</div>
+							<!-- /.info-box-content -->
+						</div>
+						<!-- /.info-box -->
+					</div>
 				</div>
 				<!-- /.row -->
+				<div class="row">
+					<div class="col-md-3 col-sm-6 col-xs-12">
+						<div class="info-box btn_KichHoatExportFileTemplateExcel">
+							<span class="info-box-icon bg-aqua"><i
+									class="fa fa-folder"></i></span>
+							<div class="info-box-content">
+								<span class="info-box-text" style="font-weight: 600">Xuất file mẫu</span>
+								<p style="font-size: 12px">Tool sẽ tự động xuất file excel mẫu import kho lưu trữ</p>
+							</div>
+							<!-- /.info-box-content -->
+						</div>
+						<!-- /.info-box -->
+					</div>
+					<div class="col-md-3 col-sm-6 col-xs-12">
+						<div class="info-box btn_KichHoatExportFileTemplateExcelVanBan">
+							<span class="info-box-icon bg-aqua"><i
+									class="fa fa-folder"></i></span>
+							<div class="info-box-content">
+								<span class="info-box-text" style="font-weight: 600">Xuất file mẫu import văn bản</span>
+								<p style="font-size: 12px">Tool sẽ tự động xuất file excel mẫu import văn bản kho lưu trữ</p>
+							</div>
+							<!-- /.info-box-content -->
+						</div>
+						<!-- /.info-box -->
+					</div>
+					<div class="col-md-3 col-sm-6 col-xs-12">
+						<div class="info-box btn_TachFilePDF">
+							<span class="info-box-icon bg-aqua"><i
+									class="fa fa-folder"></i></span>
+							<div class="info-box-content">
+								<span class="info-box-text" style="font-weight: 600">Tách file PDF dưới 150mb</span>
+								<p style="font-size: 12px">Tool sẽ tự động tạo file pdf dưới 200 mb</p>
+							</div>
+							<!-- /.info-box-content -->
+						</div>
+						<!-- /.info-box -->
+					</div>
+					<div class="col-md-3 col-sm-6 col-xs-12">
+						<div class="info-box btn_LocFilePDF">
+							<span class="info-box-icon bg-aqua"><i
+									class="fa fa-folder"></i></span>
+							<div class="info-box-content">
+								<span class="info-box-text" style="font-weight: 600">Lọc file PDF trên 199mb</span>
+								<p style="font-size: 12px">Tool sẽ tự động lọc file trên 199mb</p>
+							</div>
+							<!-- /.info-box-content -->
+						</div>
+						<!-- /.info-box -->
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-3 col-sm-6 col-xs-12">
+						<div class="info-box btn_copyFile">
+							<span class="info-box-icon bg-aqua"><i
+									class="fa fa-folder"></i></span>
+							<div class="info-box-content">
+								<span class="info-box-text" style="font-weight: 600">Copy File From Folder 2 Folder</span>
+								<p style="font-size: 12px">Tool sẽ tự động copy file từ folder được chỉ định qua folder đc ánh xạ tới</p>
+							</div>
+							<!-- /.info-box-content -->
+						</div>
+						<!-- /.info-box -->
+					</div>
+					<div class="col-md-3 col-sm-6 col-xs-12">
+						<div class="info-box btn_fixFileExcel">
+							<span class="info-box-icon bg-aqua"><i
+									class="fa fa-folder"></i></span>
+							<div class="info-box-content">
+								<span class="info-box-text" style="font-weight: 600">Fix file excel import trong folder</span>
+								<p style="font-size: 12px">Tool sẽ tự động file content file excel</p>
+							</div>
+							<!-- /.info-box-content -->
+						</div>
+						<!-- /.info-box -->
+					</div>
+					<div class="col-md-3 col-sm-6 col-xs-12">
+						<div class="info-box btn_KichHoatFixHoSo">
+							<span class="info-box-icon bg-aqua"><i
+									class="fa fa-folder"></i></span>
+							<div class="info-box-content">
+								<span class="info-box-text" style="font-weight: 600">Fix Hồ sơ</span>
+								<p style="font-size: 12px">Tool fix tiêu đề hồ sơ</p>
+							</div>
+							<!-- /.info-box-content -->
+						</div>
+						<!-- /.info-box -->
+					</div>
+					<div class="col-md-3 col-sm-6 col-xs-12">
+						<div class="info-box btn_CreateJsonDataFromFolderExcel">
+							<span class="info-box-icon bg-aqua"><i
+									class="fa fa-folder"></i></span>
+							<div class="info-box-content">
+								<span class="info-box-text" style="font-weight: 600">Tạo File Json data</span>
+								<p style="font-size: 12px">Tool tạo json data from Folder excel data</p>
+							</div>
+							<!-- /.info-box-content -->
+						</div>
+						<!-- /.info-box -->
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-3 col-sm-6 col-xs-12">
+						<div class="info-box btn_CountFileFromFolderAutoModal">
+							<span class="info-box-icon bg-aqua"><i
+									class="fa fa-folder"></i></span>
+							<div class="info-box-content">
+								<span class="info-box-text" style="font-weight: 600">Tạo danh mục hồ sơ và đếm số trang</span>
+								<p style="font-size: 12px">Tool sẽ tạo danh mục và đếm số trang theo mẫu excel</p>
+							</div>
+							<!-- /.info-box-content -->
+						</div>
+						<!-- /.info-box -->
+					</div>
+					<div class="col-md-3 col-sm-6 col-xs-12">
+						<div class="info-box btn_pupperTeer">
+							<span class="info-box-icon bg-aqua"><i
+									class="fa fa-folder"></i></span>
+							<div class="info-box-content">
+								<span class="info-box-text" style="font-weight: 600">Run Auto fill</span>
+								<p style="font-size: 12px">Sử dụng PupperTeer để auto fill data</p>
+							</div>
+							<!-- /.info-box-content -->
+						</div>
+						<!-- /.info-box -->
+					</div>
+				</div>
 			</section>
 			<!-- /.content -->
 			<div th:include="fragments/modal/kysofolder::kyso_folder"></div>
+			<div th:include="fragments/modal/kysofolder::kyso_folder_auto"></div>
+			<div th:include="fragments/modal/kysofolder::count_folder_auto"></div>
 		</div>
 		<!-- /.content-wrapper -->
 		<footer th:insert="fragments/footer/footer::footer"></footer>

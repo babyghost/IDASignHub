@@ -117,3 +117,87 @@
     </div><!-- /.modal-dialog -->
   </div><!-- /.modal -->
 </div>
+<div th:fragment="kyso_folder_auto">
+  <!--Popup-->
+  <!-- Modal Structure -->
+  <div id="kySoFolderAutoModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <!-- form start -->
+      <form role="form" method="post" action="#" id="form_kysofolder_auto" enctype="multipart/form-data">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+            <h4 class="modal-title">Ký số folder</h4>
+          </div>
+          <div class="modal-body">
+            <div class="box-body">
+              <div class="box box-primary">
+                <div class="box-header with-border">
+                  <h3 class="box-title">Path folder cần ký số</h3>
+                </div>
+                <div class="box-body">
+                  <div class="form-group">
+                    <div class="row">
+                      <div class="col-md-6 col-sm-6 col-xs-12">
+                        <label for="path_folder_kyso">Path folder</label>
+                        <input type="text" name="path_folder_kyso" id="path_folder_kyso"/>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- /.box-body -->
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
+            <button type="button" class="btn btn-primary btn-kyso-folder-auto">Ký</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </form>
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+</div>
+
+<div th:fragment="count_folder_auto">
+  <!--Popup-->
+  <!-- Modal Structure -->
+  <div id="countPathModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <!-- form start -->
+      <form role="form" method="post" action="#" id="countPathModal_auto_form" enctype="multipart/form-data">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+            <h4 class="modal-title">chọn Path folder</h4>
+          </div>
+          <div class="modal-body">
+            <div class="box-body">
+              <div class="box box-primary">
+                <div class="box-body">
+                  <div class="form-group">
+                    <div class="row">
+                      <div class="col-md-6 col-sm-6 col-xs-12">
+                        <label for="countPathModal_auto">Path folder</label>
+                        <input type="text" name="countPathModal_auto" id="countPathModal_auto"/>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- /.box-body -->
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
+            <button type="button" class="btn btn-primary btn-count-file-from-folder">Tiến hành tạo file</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </form>
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+</div>

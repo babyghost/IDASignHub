@@ -38,6 +38,7 @@ function loadData() {
 }
 
 function renderTable(data) {
+    console.log("renderTable");
     var tableBody = $('#signatureTableBody');
     tableBody.empty();
     var list = data.requestObject.config;
@@ -49,6 +50,10 @@ function renderTable(data) {
             let uri = "";
             if(item.pathImageSignHubLocalType !== "") {
                 uri = item.pathImageSignHubLocalType.replaceAll('\\', '/');
+            }
+            console.log(uri);
+            if(uri.includes(".png") || uri.includes(".jpeg")) {
+                let imgz = uri === "" ? "" : "<img width=\"100\" height=\"100\" src=\""+item.pathImageSignHubLocalType+"\" />";
             }
             let imgz = uri === "" ? "" : "<img width=\"100\" height=\"100\" src=\"data:image/jpeg;base64, "+item.pathImageSignHubLocalType+"\" />";
 

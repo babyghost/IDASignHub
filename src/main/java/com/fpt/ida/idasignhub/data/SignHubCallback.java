@@ -9,6 +9,6 @@ public class SignHubCallback implements CallbackHandler {
 
     @Override
     public void handle(Callback[] arg0) {
-        logger.info("Chưa cắm USB ký số");
+        logger.info("Log handle callback");
     }
 }
