@@ -40,7 +40,7 @@ public class KeystoreGenerator {
         long now = System.currentTimeMillis();
         Date notBefore = new Date(now - 1000L * 60 * 60 * 24);
         Date notAfter = new Date(now + (long)3650 * 24 * 60 * 60 * 1000);
-        X500Name issuer = new X500Name("CN=Test, OU=Dev, O=MyCompany, L=Hanoi, ST=Hanoi, C=VN");
+        X500Name issuer = new X500Name("CN=VN, OU=Phòng Tài nguyên Môi trường, O=Quận Cẩm Lệ, L=Đà Nẵng, ST=Đà Nẵng, C=VN");
         BigInteger serial = BigInteger.valueOf(now);
 
         JcaX509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(

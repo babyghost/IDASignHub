@@ -619,9 +619,12 @@ public class SignHub {
             X509Certificate x509Certificate = (X509Certificate) certificate;
             String[] arrSplit = x509Certificate.getSubjectDN().getName().split(",");
 //            version 1
+            System.out.println("Array Ky");
             System.out.println(Arrays.stream(arrSplit).toList());
+            coquan  = arrSplit[4].replace("OU=", "") + ", "+arrSplit[3].replace("O=", "");
 
             String noidungky = coquan +"\n"+thoigian;
+//            String noidungky = coquan +"\n"+thoigian;
             // kiểu hiển thị. 0,1,2 => 0 = hiển thị ảnh và mô tả, 1 chỉ hiển thị ảnh, 2 chỉ hiển thị mô tả.
             int showType = 0;
             // END LOAI KY
