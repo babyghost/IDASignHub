@@ -7,19 +7,34 @@ import com.fpt.ida.idasignhub.data.ShowSignature;
 import com.itextpdf.io.image.ImageData;
 import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.layout.element.Image;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.cert.X509v3CertificateBuilder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.PrivateKey;
+import java.security.SecureRandom;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
 import java.util.Base64;
+import java.util.Date;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
+
 
 public class SignHubUtill {
     /*
@@ -147,6 +162,47 @@ public class SignHubUtill {
                         }
                     });
         }
+    }
+
+
+    public static X509Certificate[] generateSelfSignedChain(int chainLength) throws Exception {
+        X509Certificate[] chain = new X509Certificate[chainLength];
+        // Chuỗi keyPairs
+        KeyPair[] keyPairs = new KeyPair[chainLength];
+        KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
+        keyGen.initialize(2048);
+        for (int i = 0; i < chainLength; i++) {
+            keyPairs[i] = keyGen.generateKeyPair();
+        }
+        SecureRandom random = new SecureRandom();
+        Date notBefore = new Date(System.currentTimeMillis() - 3600_000);
+        Date notAfter  = new Date(System.currentTimeMillis() + 365L*24*3600_000);
+        // Sinh mỗi certificate, ký bởi key tiếp theo (hoặc tự ký nếu root)
+        for (int i = 0; i < chainLength; i++) {
+            X500Name issuer  = new X500Name("CN=CA" + i);
+            X500Name subject = new X500Name("CN=Cert" + i);
+            BigInteger serial = BigInteger.valueOf(random.nextLong()).abs();
+            X509v3CertificateBuilder certBuilder =
+                    new JcaX509v3CertificateBuilder(
+                            issuer, serial, notBefore, notAfter, subject, keyPairs[i].getPublic()
+                    );
+            ContentSigner signer = new JcaContentSignerBuilder("SHA256withRSA")
+                    .build(i+1 < chainLength ? keyPairs[i+1].getPrivate() : keyPairs[i].getPrivate());
+            X509Certificate cert = new JcaX509CertificateConverter()
+                    .getCertificate(certBuilder.build(signer));
+            chain[i] = cert;
+        }
+        return chain;
+    }
+
+    public static PrivateKey generateTestPrivateKey() throws Exception {
+        // Tạo bộ sinh khóa RSA 2048 bit
+        KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
+        keyGen.initialize(2048);
+        // Sinh cặp khóa
+        KeyPair keyPair = keyGen.generateKeyPair();
+        // Lấy PrivateKey
+        return keyPair.getPrivate();
     }
     public static void zipArrayResult(String zipFolder, List<String> srcFiles, String nameFile) {
         System.out.println("zipArrayResult....");

@@ -22,6 +22,7 @@ public static String IDA_FOLDER_ENDPOINT    = "/Done_HoaPhu";
     public static String IDA_BANCOYEU_TIMESTAMP_URL = "http://tsa.ca.gov.vn";
     public static String IDA_IMAGE_QUOCHUY_URL      = IDA_ROOT_FOLDER + "/source/quochuy.png";
     public static String IDA_IMAGE_LOGO_URL         = IDA_ROOT_FOLDER + "/source/logo.png";
+    public static String IDA_IMAGE_LOGO_URL_A         = IDA_ROOT_FOLDER + "/source/logo.jpg";
     public static String IDA_IMAGE_LOGO_DRAW_URL    = IDA_ROOT_FOLDER + "/source/output_signature.png";
     public static String IDA_CONFIG_LOCAL  = IDA_ROOT_FOLDER + "/config/config.dat";
     public static String IDA_FILE_TYPE_PNG = "png";

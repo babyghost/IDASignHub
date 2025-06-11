@@ -6,6 +6,7 @@ import com.fpt.ida.idasignhub.data.*;
 import com.fpt.ida.idasignhub.util.FileUtils;
 import com.fpt.ida.idasignhub.util.PDFUtil;
 import com.fpt.ida.idasignhub.util.SignHubUtill;
+import com.fpt.ida.idasignhub.util.mock.FakeCertificate;
 import com.fpt.ida.idasignhub.validation.PdfAValidator;
 import com.itextpdf.io.image.ImageData;
 import com.itextpdf.io.image.ImageDataFactory;
@@ -250,21 +251,23 @@ public class SignHub {
                 String fileName = fileEntry.getFileName().substring(0, fileEntry.getFileName().lastIndexOf("."));
 //                IDASignHubTool\folder_filecanky\2420\2420.6648\000.00.18.H17.2017.6648.01.pdf
                 String pathOld = fileEntry.getFilePathOnServer().substring(0, fileEntry.getFilePathOnServer().lastIndexOf("\\")).replace("IDASignHubTool\\folder_filecanky\\", "");
-                System.out.println("pathOld: "+pathOld);
+
                 String signResult = folderDaKy + "/" + pathOld.replace(ConstantUtil.IDA_FOLDER_ENDPOINT_2,"") + "/"+fileName+"_signed."+extesion;
-                System.out.println("signResult: "+signResult);
+
                 File fileResult = new File(signResult);
+                System.out.println(" fileResult = "+fileResult.toPath());
                 if(!Files.exists(fileResult.toPath())) {
+                    System.out.println(" File exists ");
                     FileUtils.createFileAndFolder(signResult);
                     File file = new File(fileEntry.getFilePath());
-                    System.out.println(" ============= file = "+file.getAbsolutePath());
+                    System.out.println(" File extesion "+extesion);
                     if(extesion.equalsIgnoreCase("pdf")) {
-                        System.out.println(" ============= signing = "+file.getAbsolutePath());
                     //check file có phải la file pdf chuân A/1B ko
-                        Boolean flag = PdfAValidator.isPdfA(file);
-                        System.out.println(" KIỂM TRA " + PdfAValidator.isPdfA(file));
+//                        Boolean flag = PdfAValidator.isPdfA(file);
+//                        System.out.println(" KIỂM TRA " + flag);
                         try {
-                            SignHub.signPDFAutoFilePDF(file);
+//                            SignHub.signPDFAutoFilePDF(file);
+                            SignHub.signPDFAutoFilePDFNotHaveUsbToken(file);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -307,86 +310,6 @@ public class SignHub {
     }
 
 
-    public static void ensurePdfA1b(String srcPdf, String tmpPdfA, String iccProfilePath) throws IOException {
-        // 1. Khởi tạo PdfReader đọc file gốc
-        PdfReader reader = new PdfReader(srcPdf);
-        // 2. Khởi tạo PdfWriter ghi ra file tạm tmpPdfA
-        //    Đồng thời set version PDF = 1.4 (bắt buộc cho A-1b)
-        WriterProperties writerProps = new WriterProperties()
-                .setPdfVersion(PdfVersion.PDF_1_4);
-        PdfWriter writer = new PdfWriter(tmpPdfA, writerProps);
-
-        // 3. Tạo OutputIntent với ICC profile (sRGB)
-        PdfOutputIntent outputIntent = new PdfOutputIntent(
-                "Custom",                    // tên output intent
-                "",                          // info (để trống)
-                "http://www.color.org",      // registry
-                "sRGB IEC61966-2.1",         // output condition identifier
-                new FileInputStream(iccProfilePath)
-        );
-
-        // 4. Tạo PdfADocument ở mức conformance PDF/A-1B
-        PdfADocument pdfADoc = new PdfADocument(reader, writer, new StampingProperties().useAppendMode());
-
-        // 5. (Tuỳ chọn) Bạn có thể chèn thêm metadata XMP nếu muốn, ví dụ:
-        // pdfADoc.getDocumentInfo().setTitle("Document PDF/A-1b");
-        // PdfDictionary metadata = new PdfDictionary();
-        // metadata.put(PdfName.Title, new PdfString("PDF/A-1b Demo"));
-
-        // 6. Đóng tài liệu để ghi file tmpPdfA
-        pdfADoc.close();
-        reader.close();
-    }
-    public static void testPDFChuanA(File file) throws IOException, GeneralSecurityException {
-        System.out.println(" KIỂM TRA " + PdfAValidator.isPdfA(file));
-        String iccPath = "";
-        Resource iccResource = new ClassPathResource("icc/sRGB_CS_profile.icm");
-        iccPath = iccResource.getFile().getAbsolutePath();
-        PdfOutputIntent outputIntent = new PdfOutputIntent(
-                "Custom",                  // Tên “Profile” (tùy ý)
-                "",                        // outputConditionIdentifier (có thể để trống)
-                "http://www.color.org",    // outputCondition (URI hoặc mô tả)
-                "sRGB IEC61966-2.1",       // registryName (tên profile)
-                new FileInputStream(iccPath) // Luồng đọc file ICC
-        );
-
-        String folderDaKy = ConstantUtil.IDA_CUSTOM_FOLDER + "/folder_filedakyso";
-        if (!Files.exists(Paths.get(folderDaKy))) {
-            Files.createDirectories(Paths.get(folderDaKy));
-        }
-        String extesion = file.getName().substring(file.getName().lastIndexOf(".") + 1);
-        String fileName = file.getName().substring(0, file.getName().lastIndexOf("."));
-
-        String pathOld = file.toPath().toString().substring(0, file.toPath().toString().lastIndexOf("\\")).replace("IDASignHubTool\\folder_filecanky\\", "");
-        System.out.println("pathOld: "+pathOld);
-        String signResult = folderDaKy + "/" + pathOld.replace("F:\\Done_HoaPhu","") + "/"+fileName+"_signed."+extesion;
-        System.out.println("signResult3: "+signResult);
-
-        PdfDocument srcDoc = null;
-        PdfReader reader = new PdfReader(file);
-        srcDoc = new PdfDocument(new PdfReader(file));
-        WriterProperties writerProps = new WriterProperties()
-                .setPdfVersion(PdfVersion.PDF_1_4);
-
-        PdfWriter writer = new PdfWriter(signResult, writerProps);
-        // 4. Tạo PdfSigner ở chế độ “append mode”
-        StampingProperties props = new StampingProperties().useAppendMode();
-        // 5. Mở PdfADocument ở chế độ stamping mode (append)
-        PdfADocument pdfADoc =  new PdfADocument(
-                writer,
-                PdfAConformanceLevel.PDF_A_1B,
-                outputIntent
-        );
-        int nPages = srcDoc.getNumberOfPages();
-        srcDoc.copyPagesTo(1, nPages, pdfADoc);
-
-        System.out.println("pdfADoc: "+pdfADoc.getNumberOfPages());
-        pdfADoc.close();
-        srcDoc.close();
-        reader.close();
-    }
-
-
     public static void signPDFAutoFilePDFTypeA1B(File file) throws IOException, GeneralSecurityException {
         try {
         String iccPath = "";
@@ -403,7 +326,7 @@ public class SignHub {
         );
 
 //        SimpleDateFormat df = new SimpleDateFormat(ConstantUtil.IDA_SIMPLEDATEFORMAT_DATE_TIME);
-        String imageLogoPath = ConstantUtil.IDA_IMAGE_LOGO_URL;
+        String imageLogoPath = ConstantUtil.IDA_IMAGE_LOGO_URL_A;
         String urlfont = ConstantUtil.IDA_FONT_URL;
         String folderDaKy = ConstantUtil.IDA_CUSTOM_FOLDER + "/folder_filedakyso";
         String folderDaKy_tmp = ConstantUtil.IDA_CUSTOM_FOLDER + "/folder_tmp";
@@ -467,18 +390,6 @@ public class SignHub {
                 );
 
                 int nPages = srcDoc.getNumberOfPages();
-//                System.out.println("nPages: "+nPages);
-//                pdfADoc.getCatalog().remove(PdfName.Metadata);
-//                PdfDocumentInfo info = pdfADoc.getDocumentInfo();
-//                info.setMoreInfo("pdfaid:part", "1");        // phải là "1" (chuẩn PDF/A-1)
-//                info.setMoreInfo("pdfaid:conformance", "B"); // "A" hoặc "B"
-//                info.setMoreInfo("pdfaid:revision", "0001"); // PHẢI 4 chữ số
-//                pdfADoc.getCatalog().remove(PdfName.Metadata);
-//                pdfADoc.getCatalog().remove(PdfName.Lang);
-//                pdfADoc.getCatalog().remove(PdfName.StructTreeRoot);
-//                pdfADoc.getCatalog().remove(PdfName.MarkInfo);
-//                pdfADoc.getCatalog().remove(PdfName.PieceInfo);
-
 
                 srcDoc.copyPagesTo(1, nPages, pdfADoc);
 
@@ -504,13 +415,9 @@ public class SignHub {
                         writer_2,
                         props
                 );
-
                 // lay config default
-
                 float xLocation   = config.getxLocation();
                 float yLocation   = config.getyLocation();
-
-
 
                 String nguoiky  = "Ho Dac Tai";
                 String email    = "dactaiit@gmail.com";
@@ -526,8 +433,8 @@ public class SignHub {
 //                coquan  = arrSplit[2].replace("O=", "");
                 // version 2
 //                nguoiky = arrSplit[0].replace("EMAILADDRESS=", "");
-                coquan  = arrSplit[1].replace("CN=", "");  //Hòa Phú
-//                coquan  = arrSplit[3].replace("CN=", "") + ", "+arrSplit[4].replace("OU=", "");
+//                coquan  = arrSplit[1].replace("CN=", "");  //Hòa Phú
+                coquan  = arrSplit[3].replace("CN=", "") + ", "+arrSplit[4].replace("OU=", "");
                 System.out.println(Arrays.stream(arrSplit).toList());
 //                ShowSignature showSignature = config.getShowSignature();
                 // Lấy dấu timestamping Authority
@@ -631,7 +538,154 @@ public class SignHub {
         }
     }
 
+    public static void signPDFAutoFilePDFNotHaveUsbToken(File file) throws IOException{
+        SimpleDateFormat df = new SimpleDateFormat(ConstantUtil.IDA_SIMPLEDATEFORMAT_DATE_TIME);
+        String imageLogoPath = ConstantUtil.IDA_IMAGE_LOGO_URL;
+        String urlfont = ConstantUtil.IDA_FONT_URL;
+        String folderDaKy = ConstantUtil.IDA_CUSTOM_FOLDER + "/folder_filedakyso";
 
+        // set config default
+        ConfigSignature config = new ConfigSignature();
+        config.setCoutryLocation("VN");
+        config.setHeightSignature(50);
+        config.setWidthSignature(180);
+        config.setFontSizeSignature(7);
+        config.setReasonSign("Sign PDF");
+        config.setImgSignBase64(null);
+//        config.setxLocation(480); // trên trái
+//        config.setyLocation(740); // trên trái
+        config.setPageSign(1);
+        config.setCryptoStandard("CMS");
+        config.setTimeStampServer(ConstantUtil.IDA_BANCOYEU_TIMESTAMP_URL);
+        ShowSignature showSignature = new ShowSignature();
+        showSignature.setShowType(0); //1 là có hình ảnh. 2 là ko
+        showSignature.setShowInfoExtends("INFOLABEL_ORGANIZATION_TIMESTAMP");
+        config.setShowSignature(showSignature);
+        config.setSignatureType("KY_SOHOA");
+        config.setLocationSign("tren_phai");
+
+        if (!Files.exists(Paths.get(folderDaKy))) {
+            Files.createDirectories(Paths.get(folderDaKy));
+        }
+        String extesion = file.getName().substring(file.getName().lastIndexOf(".") + 1);
+        String fileName = file.getName().substring(0, file.getName().lastIndexOf("."));
+        String pathOld = file.toPath().toString().substring(0, file.toPath().toString().lastIndexOf("\\")).replace("IDASignHubTool\\folder_filecanky\\", "");
+        String signResult = folderDaKy + "/" + pathOld.replace(ConstantUtil.IDA_FOLDER_ENDPOINT_2,"") + "/"+fileName+"_signed."+extesion;
+        try {
+
+            PdfReader reader = new PdfReader(file);
+            PdfWriter writer = new PdfWriter(signResult);
+            PdfSigner signer = new PdfSigner(reader, writer, new StampingProperties().useAppendMode());
+            PdfDocument pdfDoc = signer.getDocument();
+            // lay config default
+            int numberOfPages = pdfDoc.getNumberOfPages(); // số lượng file của file
+            float xLocation   = config.getxLocation();
+            float yLocation   = config.getyLocation();
+
+            int pageSign = config.getPageSign(); // page ký số
+            if(pageSign > numberOfPages) {
+                pageSign = numberOfPages;
+            }
+            float pageHeight = pdfDoc.getPage(pageSign).getPageSize().getHeight();
+            float pageWidth  = pdfDoc.getPage(pageSign).getPageSize().getWidth();
+
+            String coquan   = "Trường THPT Phạm Văn Đồng";
+            String thoigian = "Ngày 13/9/2024 09:48";
+
+            String pkcs12   = "content/fakekeystore.jks";
+            String keystorePassword = "changeit";
+            String keyAlias = "testkey";
+            String keyPassword = "changeit";
+
+            Security.addProvider(new BouncyCastleProvider());
+            Resource fileResource = new ClassPathResource(pkcs12);
+            String pkcs12Path = fileResource.getFile().getAbsolutePath();
+            KeyStore ks = KeyStore.getInstance("JKS");
+            ks.load(new FileInputStream(pkcs12Path), keystorePassword.toCharArray());
+
+
+            // URL của dịch vụ TSA (Time Stamping Authority)
+//            String tsaUrl = config.getTimeStampServer(); // Bạn có thể thay bằng URL của TSA bạn sử dụng
+//            TSAClientBouncyCastle tsaClient = new TSAClientBouncyCastle(tsaUrl, null, null);
+            Calendar signingDate = Calendar.getInstance();
+            ZonedDateTime now = ZonedDateTime.now(ZoneOffset.ofHours(7));
+            DateTimeFormatter f = DateTimeFormatter.ofPattern("dd.MM.yyyy  HH:mm:ss XXX");
+            thoigian = now.format(f);
+
+            PrivateKey pk = (PrivateKey) ks.getKey(keyAlias, keyPassword.toCharArray());
+            Certificate[] chain = ks.getCertificateChain(keyAlias);
+
+            Certificate certificate         = ks.getCertificate(keyAlias);
+            X509Certificate x509Certificate = (X509Certificate) certificate;
+            String[] arrSplit = x509Certificate.getSubjectDN().getName().split(",");
+//            version 1
+            System.out.println(Arrays.stream(arrSplit).toList());
+
+            String noidungky = coquan +"\n"+thoigian;
+            // kiểu hiển thị. 0,1,2 => 0 = hiển thị ảnh và mô tả, 1 chỉ hiển thị ảnh, 2 chỉ hiển thị mô tả.
+            int showType = 0;
+            // END LOAI KY
+            System.out.println(noidungky);
+            ImageData signatureImage = ImageDataFactory.create(imageLogoPath);
+
+            float width  = 180;
+            float height = 50;
+
+            if(!config.getLocationSign().isEmpty()) {
+                LocationSignConvertXY locationSignConvertXY = new LocationSignConvertXY(config.getLocationSign(), pageHeight, pageWidth, height, width);
+                xLocation = locationSignConvertXY.getxLocation();
+                yLocation = locationSignConvertXY.getyLocation();
+            }
+
+            // convert tọa độ
+//
+            PdfSigner.CryptoStandard cryptoStandard = PdfSigner.CryptoStandard.CMS;
+
+//            cryptoStandard = PdfSigner.CryptoStandard.CADES;
+
+            Rectangle rect = new Rectangle(xLocation, yLocation, width, height);
+            //Rectangle rect = new Rectangle(xLocation, yLocation, width, height); // (x, y, width, height) - vị trí chữ ký trên trang PDF
+            PdfSignatureAppearance appearance = signer.getSignatureAppearance();
+            appearance.setReason("");
+            appearance.setLocation("");
+            appearance.setContact("");
+            appearance.setLayer2Text(noidungky);
+            appearance.setReuseAppearance(false);
+            appearance.setPageRect(rect);
+
+            // 0 = ImageAndInfo, 1 = Image, 2 = Info
+            if(showType == 1) {
+                appearance.setSignatureGraphic(signatureImage);
+                appearance.setRenderingMode(PdfSignatureAppearance.RenderingMode.GRAPHIC);
+            } else if(showType == 2) {
+                appearance.setRenderingMode(PdfSignatureAppearance.RenderingMode.DESCRIPTION);
+            } else {
+                appearance.setSignatureGraphic(signatureImage);
+                appearance.setRenderingMode(PdfSignatureAppearance.RenderingMode.GRAPHIC_AND_DESCRIPTION);
+            }
+            appearance.setImageScale(-1); // Điều chỉnh tỷ lệ hình ảnh nếu cần
+
+            int fontSize = 7;
+            float resolution  = 300;
+//                float scaledFontSize = fontSize * (resolution / 72f);
+            appearance.setLayer2FontSize(fontSize);
+            PdfFont font = PdfFontFactory.createFont(urlfont);
+            appearance.setLayer2Font(font);
+            appearance.setPageNumber(pageSign);
+
+            signer.setFieldName("Signature");
+            IExternalSignature pks = new PrivateKeySignature(pk, DigestAlgorithms.SHA256, BouncyCastleProvider.PROVIDER_NAME);
+            IExternalDigest digest = new BouncyCastleDigest();
+            signer.signDetached(digest, pks, chain, null, null, null, 0, cryptoStandard);
+            Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);
+            //giải phóng bộ nhớ
+            reader.close();
+
+            System.out.println("Done Signing ...");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
     public static void signPDFAutoFilePDF(File file) throws IOException{
         SimpleDateFormat df = new SimpleDateFormat(ConstantUtil.IDA_SIMPLEDATEFORMAT_DATE_TIME);
         String imageLogoPath = ConstantUtil.IDA_IMAGE_LOGO_URL;
@@ -683,7 +737,6 @@ public class SignHub {
                 PdfWriter writer = new PdfWriter(signResult);
                 PdfSigner signer = new PdfSigner(reader, writer, new StampingProperties().useAppendMode());
                 PdfDocument pdfDoc = signer.getDocument();
-
                 // lay config default
                 int numberOfPages = pdfDoc.getNumberOfPages(); // số lượng file của file
                 float xLocation   = config.getxLocation();
@@ -712,6 +765,7 @@ public class SignHub {
 //                nguoiky = arrSplit[0].replace("EMAILADDRESS=", "");
 //                coquan  = arrSplit[1].replace("CN=", "");
                 coquan = arrSplit[0].replace("CN=", "") + ", Quận Cẩm Lệ, Thành phố Đà Nẵng";
+//                coquan  = arrSplit[3].replace("CN=", "") + ", "+arrSplit[4].replace("OU=", "");
                 System.out.println(Arrays.stream(arrSplit).toList());
 //                ShowSignature showSignature = config.getShowSignature();
                 // Lấy dấu timestamping Authority
