@@ -60,7 +60,7 @@ public class IdaSignHubApplication {
 			}
 		});
 
-		TrayIcon trayIcon = new TrayIcon(image, "IDA SignHub Tool", trayPopupMenu);
+		TrayIcon trayIcon = new TrayIcon(image, "SignHub Tool", trayPopupMenu);
 		trayIcon.setImageAutoSize(true);
 		trayPopupMenu.add(goToDashboard);
 		trayPopupMenu.add(exitItem);

@@ -6,10 +6,10 @@ import java.nio.file.Paths;
 public class ConstantUtil {
     private static final Path rootLocation    = Paths.get("IDASignHubTool");
     public static String IDA_ROOT_FOLDER      = rootLocation.toString();
-    public static String IDA_CUSTOM_FOLDER      = "F:/";
+    public static String IDA_CUSTOM_FOLDER      = "D:/";
 //    public static String IDA_FOLDER_ENDPOINT    = "/Done_ThanhKhe/Merge_done";
-public static String IDA_FOLDER_ENDPOINT    = "/Done_HoaPhu";
-    public static String IDA_FOLDER_ENDPOINT_2  = "F:\\Done_HoaPhu";
+public static String IDA_FOLDER_ENDPOINT    = "/42";
+    public static String IDA_FOLDER_ENDPOINT_2  = "D:\\42";
 //    public static String IDA_FOLDER_ENDPOINT_2  = "F:\\Done_ThanhKhe\\Merge_done";
     public static String IDA_CONFIG_FOLDER    = IDA_ROOT_FOLDER + "/config";
     public static String IDA_DRIVER_TOKEN_USB_URL = IDA_ROOT_FOLDER + "/config/pkcs11.cfg";

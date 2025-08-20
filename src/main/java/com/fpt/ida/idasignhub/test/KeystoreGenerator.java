@@ -25,7 +25,7 @@ public class KeystoreGenerator {
         // Register BouncyCastle
         Security.addProvider(new BouncyCastleProvider());
         // Keystore parameters
-        String keyStorePath = "fakekeystore.jks";
+        String keyStorePath = "ida_test.jks";
         char[] storePassword = "changeit".toCharArray();
         char[] keyPassword = "changeit".toCharArray();
         String alias = "testkey";
@@ -40,7 +40,7 @@ public class KeystoreGenerator {
         long now = System.currentTimeMillis();
         Date notBefore = new Date(now - 1000L * 60 * 60 * 24);
         Date notAfter = new Date(now + (long)3650 * 24 * 60 * 60 * 1000);
-        X500Name issuer = new X500Name("CN=VN, OU=Phòng Tài nguyên Môi trường, O=Quận Cẩm Lệ, L=Đà Nẵng, ST=Đà Nẵng, C=VN");
+        X500Name issuer = new X500Name("CN=IDA Test ký số, OU=FPT IS, O=FPT, L=Đà Nẵng, C=VN");
         BigInteger serial = BigInteger.valueOf(now);
 
         JcaX509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(

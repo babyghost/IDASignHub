@@ -4,10 +4,7 @@ import com.fpt.ida.idasignhub.bussiness.excel.ExcelGeneratorForSignData;
 import com.fpt.ida.idasignhub.constant.ConstantUtil;
 import com.fpt.ida.idasignhub.data.*;
 import com.fpt.ida.idasignhub.util.FileUtils;
-import com.fpt.ida.idasignhub.util.PDFUtil;
 import com.fpt.ida.idasignhub.util.SignHubUtill;
-import com.fpt.ida.idasignhub.util.mock.FakeCertificate;
-import com.fpt.ida.idasignhub.validation.PdfAValidator;
 import com.itextpdf.io.image.ImageData;
 import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.kernel.font.PdfFont;
@@ -25,24 +22,22 @@ import org.usb4java.*;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.*;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
-import static com.itextpdf.forms.xfdf.XfdfConstants.DEST;
-
 public class SignHub {
+    private static long programStartTime = System.currentTimeMillis();
 
     public static KeyStore loadUsbToken() throws NoSuchAlgorithmException {
         for (String algorithm : Security.getAlgorithms("Signature")) {
@@ -266,7 +261,7 @@ public class SignHub {
 //                        Boolean flag = PdfAValidator.isPdfA(file);
 //                        System.out.println(" KIỂM TRA " + flag);
                         try {
-//                            SignHub.signPDFAutoFilePDF(file);
+                            //SignHub.signPDFAutoFilePDF(file);
                             SignHub.signPDFAutoFilePDFNotHaveUsbToken(file);
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -547,7 +542,7 @@ public class SignHub {
         // set config default
         ConfigSignature config = new ConfigSignature();
         config.setCoutryLocation("VN");
-        config.setHeightSignature(50);
+        config.setHeightSignature(200);
         config.setWidthSignature(180);
         config.setFontSizeSignature(7);
         config.setReasonSign("Sign PDF");
@@ -592,7 +587,7 @@ public class SignHub {
             String coquan   = "Trường THPT Phạm Văn Đồng";
             String thoigian = "Ngày 13/9/2024 09:48";
 
-            String pkcs12   = "content/fakekeystore.jks";
+            String pkcs12   = "content/pnv_hv.jks";
             String keystorePassword = "changeit";
             String keyAlias = "testkey";
             String keyPassword = "changeit";
@@ -608,7 +603,14 @@ public class SignHub {
 //            String tsaUrl = config.getTimeStampServer(); // Bạn có thể thay bằng URL của TSA bạn sử dụng
 //            TSAClientBouncyCastle tsaClient = new TSAClientBouncyCastle(tsaUrl, null, null);
             Calendar signingDate = Calendar.getInstance();
-            ZonedDateTime now = ZonedDateTime.now(ZoneOffset.ofHours(7));
+//            ZonedDateTime now = ZonedDateTime.now(ZoneOffset.ofHours(7));
+            ZonedDateTime baseStartTime = ZonedDateTime.of(
+                    2025, 6, 19, 15, 43, 30, 0, ZoneOffset.ofHours(7)
+            );
+
+            long elapsedMillis = System.currentTimeMillis() - programStartTime;
+            ZonedDateTime now = baseStartTime.plus(elapsedMillis, ChronoUnit.MILLIS);
+
             DateTimeFormatter f = DateTimeFormatter.ofPattern("dd.MM.yyyy  HH:mm:ss XXX");
             thoigian = now.format(f);
 
@@ -621,10 +623,12 @@ public class SignHub {
 //            version 1
             System.out.println("Array Ky");
             System.out.println(Arrays.stream(arrSplit).toList());
-            coquan  = arrSplit[4].replace("OU=", "") + ", "+arrSplit[3].replace("O=", "");
-
+             //coquan  = "MST:0401302223, PHÒNG NỘI VỤ, ỦY BAN NHÂN DÂN HUYỆN HÒA VANG";
+            //coquan  = "ỦY BAN NHÂN DÂN XÃ HÒA PHƯỚC, ỦY BAN NHÂN DÂN HUYỆN HÒA VANG, TP Đà Nẵng";
+            //coquan  = "MST:0400520469, Ủy ban nhân dân phường Hòa Cường nam, Quận Hải Châu, Đà Nẵng";
+            //coquan  = arrSplit[4].replace("UID=", "") + ", "+arrSplit[3].replace("CN=", "") + ", " + arrSplit[2].replace("OU=", "");
+            coquan = arrSplit[5].replace("UID=", "") + ", " + arrSplit[4].replace("CN=", "") + ", " + arrSplit[3].replace("OU=", "");
             String noidungky = coquan +"\n"+thoigian;
-//            String noidungky = coquan +"\n"+thoigian;
             // kiểu hiển thị. 0,1,2 => 0 = hiển thị ảnh và mô tả, 1 chỉ hiển thị ảnh, 2 chỉ hiển thị mô tả.
             int showType = 0;
             // END LOAI KY
@@ -689,6 +693,7 @@ public class SignHub {
             throw new RuntimeException(e);
         }
     }
+
     public static void signPDFAutoFilePDF(File file) throws IOException{
         SimpleDateFormat df = new SimpleDateFormat(ConstantUtil.IDA_SIMPLEDATEFORMAT_DATE_TIME);
         String imageLogoPath = ConstantUtil.IDA_IMAGE_LOGO_URL;
@@ -698,7 +703,7 @@ public class SignHub {
         ConfigSignature config = new ConfigSignature();
         config.setCoutryLocation("VN");
         config.setHeightSignature(50);
-        config.setWidthSignature(180);
+        config.setWidthSignature(220);
         config.setFontSizeSignature(7);
         config.setReasonSign("Sign PDF");
         config.setImgSignBase64(null);
@@ -767,8 +772,9 @@ public class SignHub {
                 // version 2
 //                nguoiky = arrSplit[0].replace("EMAILADDRESS=", "");
 //                coquan  = arrSplit[1].replace("CN=", "");
-                coquan = arrSplit[0].replace("CN=", "") + ", Quận Cẩm Lệ, Thành phố Đà Nẵng";
-//                coquan  = arrSplit[3].replace("CN=", "") + ", "+arrSplit[4].replace("OU=", "");
+                //coquan = arrSplit[0].replace("UID=","") + ", " + arrSplit[1].replace("CN=", "") + ", Quận Hải Châu, Đà Nẵng";
+                coquan  = arrSplit[3].replace("CN=", "") + ", " + arrSplit[4].replace("O=", "");
+                //coquan = arrSplit[0].replace("CN=", "") + ", " + arrSplit[1].replace("OU=", "") + ", " + arrSplit[2].replace("O=", "") + ", " + arrSplit[3].replace("L=", "");
                 System.out.println(Arrays.stream(arrSplit).toList());
 //                ShowSignature showSignature = config.getShowSignature();
                 // Lấy dấu timestamping Authority

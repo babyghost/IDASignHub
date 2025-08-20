@@ -1,0 +1,206 @@
+# IDA SignHub Desktop Application Configuration
+spring:
+  application:
+    name: ida-signhub-desktop
+  profiles:
+    active: desktop
+
+  # Embedded server configuration
+  server:
+    port: 0  # Use random available port
+    servlet:
+      context-path: ""
+    compression:
+      enabled: false
+    error:
+      whitelabel:
+        enabled: false
+
+  # Disable web features not needed for desktop
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration
+      - org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration
+
+  # Main configuration
+  main:
+    web-application-type: servlet
+    banner-mode: "off"
+    register-shutdown-hook: true
+
+  # JMX disabled for desktop app
+  jmx:
+    enabled: false
+
+  # Actuator disabled for desktop
+  management:
+    endpoints:
+      enabled-by-default: false
+
+# IDA SignHub Desktop Specific Configuration
+ida:
+  sign:
+    # Desktop mode settings
+    desktop:
+      enabled: true
+      window:
+        width: 800
+        height: 600
+        min-width: 600
+        min-height: 400
+        resizable: true
+        title: "SignHub - Ký số hàng loạt"
+
+      # System tray configuration
+      system-tray:
+        enabled: true
+        tooltip: "SignHub - Công cụ ký số hàng loạt"
+        minimize-to-tray: true
+        close-to-tray: true
+        auto-start: false
+
+      # Auto-update configuration
+      auto-update:
+        enabled: false
+        check-interval: 24h
+        update-url: "https://updates.fpt.com.vn/ida-signhub"
+
+    # Folder Configuration - User configurable
+    folders:
+      user-home: ${user.home}/IDASignHub
+      config: ${ida.sign.folders.user-home}/config
+      logs: ${ida.sign.folders.user-home}/logs
+      temp: ${ida.sign.folders.user-home}/temp
+      input: ${ida.sign.folders.user-home}/input
+      output: ${ida.sign.folders.user-home}/output
+
+    # Signing Configuration - User configurable via UI
+    signing:
+      default-width: 180
+      default-height: 50
+      default-font-size: 7
+      default-location: "tren_phai"
+      default-crypto-standard: "CMS"
+      default-signature-type: "KY_SOHOA"
+      default-show-type: 0
+
+      # Performance settings
+      batch-size: 10
+      thread-pool-size: 2
+      timeout-seconds: 300
+
+    # Security settings
+    security:
+      usb-token:
+        provider: "SunPKCS11-VGCAToken"
+        auto-detect: true
+        timeout: 30000
+
+      # Certificate validation
+      certificate:
+        validate-chain: true
+        check-revocation: false
+        allow-self-signed: false
+
+    # UI Theme settings
+    ui:
+      theme: "default"
+      language: "vi"
+      font-family: "Segoe UI"
+      font-size: 12
+
+      # Color scheme
+      colors:
+        primary: "#3498db"
+        success: "#27ae60"
+        warning: "#f39c12"
+        danger: "#e74c3c"
+        background: "#ecf0f1"
+
+# Logging Configuration for Desktop
+logging:
+  level:
+    com.fpt.ida.idasignhub: INFO
+    org.springframework: WARN
+    javafx: WARN
+    root: WARN
+
+  pattern:
+    console: "%d{HH:mm:ss} %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+  file:
+    name: ${ida.sign.folders.logs}/ida-signhub.log
+    max-size: 10MB
+    max-history: 30
+    total-size-cap: 100MB
+
+# Performance tuning for desktop app
+server:
+  tomcat:
+    threads:
+      max: 10
+      min-spare: 2
+    connection-timeout: 5000
+    max-connections: 50
+
+# Memory management
+spring:
+  jpa:
+    open-in-view: false
+
+  # Reduce startup time
+  devtools:
+    restart:
+      enabled: false
+    livereload:
+      enabled: false
+
+---
+# Development Profile for Desktop
+spring:
+  config:
+    activate:
+      on-profile: desktop-dev
+
+logging:
+  level:
+    com.fpt.ida.idasignhub: DEBUG
+    javafx.application: DEBUG
+
+ida:
+  sign:
+    desktop:
+      auto-update:
+        enabled: false
+      system-tray:
+        auto-start: false
+
+---
+# Production Profile for Desktop
+spring:
+  config:
+    activate:
+      on-profile: desktop-prod
+
+logging:
+  level:
+    com.fpt.ida.idasignhub: INFO
+    org.springframework: WARN
+    root: WARN
+
+ida:
+  sign:
+    desktop:
+      auto-update:
+        enabled: true
+      system-tray:
+        auto-start: true
+        minimize-to-tray: true
+
+# Error handling for production
+server:
+  error:
+    include-message: never
+    include-binding-errors: never
+    include-stacktrace: never
