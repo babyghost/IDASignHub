@@ -23,10 +23,10 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.usb4java.*;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -39,7 +39,6 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.List;
 
 import static com.itextpdf.forms.xfdf.XfdfConstants.DEST;
 
@@ -317,6 +316,7 @@ public class SignHub {
             System.out.println("Bước 1: load dữ liệu từ folder");
             String folderDaKy = ConstantUtil.IDA_ROOT_FOLDER + "/folder_filedakyso";
             String folderChuaKy = ConstantUtil.IDA_ROOT_FOLDER + "/folder_filecanky";
+
 //            String folderDaKy = ConstantUtil.IDA_CUSTOM_FOLDER + "/folder_filedakyso";
 //            String folderChuaKy = ConstantUtil.IDA_CUSTOM_FOLDER + "/Done_HoaPhu";
 //            String folderChuaKy = ConstantUtil.IDA_CUSTOM_FOLDER +  ConstantUtil.IDA_FOLDER_ENDPOINT;
@@ -657,7 +657,7 @@ public class SignHub {
         config.setCryptoStandard("CMS");
         config.setTimeStampServer(ConstantUtil.IDA_BANCOYEU_TIMESTAMP_URL);
         ShowSignature showSignature = new ShowSignature();
-        showSignature.setShowType(2); //1 là có hình ảnh. 2 là ko
+        showSignature.setShowType(0); //1 là có hình ảnh. 2 là ko // 0 la co ca 2
         showSignature.setShowInfoExtends("INFOLABEL_ORGANIZATION_TIMESTAMP");
         config.setShowSignature(showSignature);
         config.setSignatureType("KY_SOHOA");
@@ -788,392 +788,187 @@ public class SignHub {
             throw new RuntimeException(e);
         }
     }
-    public static void signPDFAutoFilePDF(File file) throws IOException {
+    public static void signPDFAutoFilePDF(File file) throws IOException{
         SimpleDateFormat df = new SimpleDateFormat(ConstantUtil.IDA_SIMPLEDATEFORMAT_DATE_TIME);
         String imageLogoPath = ConstantUtil.IDA_IMAGE_LOGO_URL;
         String urlfont = ConstantUtil.IDA_FONT_URL;
-        String folderDaKy = ConstantUtil.IDA_CUSTOM_FOLDER + "/folder_filedakyso";
-
+        String folderDaKy = ConstantUtil.IDA_ROOT_FOLDER + "/folder_filedakyso";
         // set config default
         ConfigSignature config = new ConfigSignature();
         config.setCoutryLocation("VN");
         config.setHeightSignature(50);
-        config.setWidthSignature(220);
+        config.setWidthSignature(180);
         config.setFontSizeSignature(7);
         config.setReasonSign("Sign PDF");
         config.setImgSignBase64(null);
+//        config.setxLocation(480); // trên trái
+//        config.setyLocation(740); // trên trái
         config.setPageSign(1);
         config.setCryptoStandard("CMS");
         config.setTimeStampServer(ConstantUtil.IDA_BANCOYEU_TIMESTAMP_URL);
         ShowSignature showSignature = new ShowSignature();
-        showSignature.setShowType(0);
+        showSignature.setShowType(0); //1 là có hình ảnh. 2 là ko
         showSignature.setShowInfoExtends("INFOLABEL_ORGANIZATION_TIMESTAMP");
         config.setShowSignature(showSignature);
         config.setSignatureType("KY_SOHOA");
-        config.setLocationSign("tren_phai");
+        config.setLocationSign("tren_trai");
 
         if (!Files.exists(Paths.get(folderDaKy))) {
             Files.createDirectories(Paths.get(folderDaKy));
         }
-
         String extesion = file.getName().substring(file.getName().lastIndexOf(".") + 1);
         String fileName = file.getName().substring(0, file.getName().lastIndexOf("."));
-        String pathOld = file.toPath().toString().substring(0, file.toPath().toString().lastIndexOf("\\")).replace("IDASignHubTool\\folder_filecanky\\", "");
-        String signResult = folderDaKy + "/" + pathOld.replace(ConstantUtil.IDA_FOLDER_ENDPOINT_2,"") + "/"+fileName+"_signed."+extesion;
 
+        String pathOld = file.toPath().toString().substring(0, file.toPath().toString().lastIndexOf("\\")).replace("IDASignHubTool\\folder_filecanky\\", "");
+        System.out.println("pathOld: "+pathOld);
+        String signResult = folderDaKy + "/" + pathOld.replace(ConstantUtil.IDA_FOLDER_ENDPOINT,"") + "/"+fileName+"_signed."+extesion;
+        System.out.println("signResult3: "+signResult);
         try {
             String alias = null;
             KeyStore keyStore = SignHub.loadUsbToken();
             alias = SignHub.getAliasByKeyStore(keyStore);
-
+//            if (Objects.nonNull(alias)) {
+//                System.out.println("alias: "+alias);
+//                Certificate[] chain   = keyStore.getCertificateChain(alias);
+//            }
             if (Objects.nonNull(alias)) {
                 //  Lấy certificate từ alias;
-                Certificate[] chain = keyStore.getCertificateChain(alias);
+                Certificate[] chain   = keyStore.getCertificateChain(alias);
                 PrivateKey privateKey = (PrivateKey) keyStore.getKey(alias, null);
-
-                // First, check if the source PDF is already PDF/A
-                boolean isPdfA = isPdfADocument(file);
-
-                if (isPdfA) {
-                    // If source is PDF/A, use PDF/A compatible signing
-                    signWithPdfAComplianceUsbToken(file, signResult, config, keyStore, alias, chain, privateKey);
-                } else {
-                    // If source is regular PDF, use regular signing
-                    signRegularPdfUsbToken(file, signResult, config, keyStore, alias, chain, privateKey);
+                PdfReader reader = new PdfReader(file);
+                PdfWriter writer = new PdfWriter(signResult);
+                PdfSigner signer = new PdfSigner(reader, writer, new StampingProperties().useAppendMode());
+                PdfDocument pdfDoc = signer.getDocument();
+                // lay config default
+                int numberOfPages = pdfDoc.getNumberOfPages(); // số lượng file của file
+                float xLocation   = config.getxLocation();
+                float yLocation   = config.getyLocation();
+                int pageSign = config.getPageSign(); // page ký số
+                if(pageSign > numberOfPages) {
+                    pageSign = numberOfPages;
                 }
+
+                float pageHeight = pdfDoc.getPage(pageSign).getPageSize().getHeight();
+                float pageWidth  = pdfDoc.getPage(pageSign).getPageSize().getWidth();
+
+                String nguoiky  = "Ho Dac Tai";
+                String email    = "dactaiit@gmail.com";
+                String coquan   = "Trường THPT Phạm Văn Đồng";
+                String thoigian = "Ngày 13/9/2024 09:48";
+
+                Certificate certificate         = keyStore.getCertificate(alias);
+                X509Certificate x509Certificate = (X509Certificate) certificate;
+                String[] arrSplit = x509Certificate.getSubjectDN().getName().split(",");
+                //version 1
+                System.out.println(Arrays.stream(arrSplit).toList());
+//                nguoiky = arrSplit[0].replace("CN=", "");
+//                coquan  = arrSplit[2].replace("O=", "");
+                // version 2
+//                nguoiky = arrSplit[0].replace("EMAILADDRESS=", "");
+//                coquan  = arrSplit[1].replace("CN=", "");
+//                coquan = arrSplit[0].replace("CN=", "") + ", Quận Cẩm Lệ, Thành phố Đà Nẵng";
+//                coquan  = arrSplit[3].replace("CN=", "") + ", "+arrSplit[4].replace("OU=", "");
+                System.out.println(Arrays.stream(arrSplit).toList());
+//                coquan = "Đảng Ủy Phường Thanh Khê Đông, Quận Thanh Khê, Tp Đà Nẵng";
+                coquan = "VĂN PHÒNG TỈNH ỦY VĨNH LONG";
+//                ShowSignature showSignature = config.getShowSignature();
+                // Lấy dấu timestamping Authority
+                // URL của dịch vụ TSA (Time Stamping Authority)
+                String tsaUrl = config.getTimeStampServer(); // Bạn có thể thay bằng URL của TSA bạn sử dụng
+                TSAClientBouncyCastle tsaClient = new TSAClientBouncyCastle(tsaUrl, null, null);
+                Calendar signingDate = Calendar.getInstance();
+                ZonedDateTime now = ZonedDateTime.now(ZoneOffset.ofHours(7));
+                DateTimeFormatter f = DateTimeFormatter.ofPattern("dd.MM.yyyy  HH:mm:ss XXX");
+                thoigian = now.format(f);
+                email       = x509Certificate.getSubjectAlternativeNames().stream().toList().get(0).get(1).toString();
+
+//                String noidungky =  nguoiky + "," +"\n" + coquan +"\n"+thoigian;
+//                [EMAILADDRESS=syt@danang.gov.vn,  UID=MST:0400260612,  UID=MNS:1047665,  CN=S? Y T?,  O=?Y BAN NH?N D?N TH?NH PH? ?? N?NG,  L=?à N?ng,  C=VN]
+                String noidungky = coquan +"\n"+thoigian;
+                // kiểu hiển thị. 0,1,2 => 0 = hiển thị ảnh và mô tả, 1 chỉ hiển thị ảnh, 2 chỉ hiển thị mô tả.
+                int showType = showSignature.getShowType();
+                // KY_SAOY; KY_SAOLUC; KY_TRICKSAO;
+                if(config.getSignatureType() != null && config.getSignatureType().equals("KY_SAOY")) {
+                    noidungky = "SAO Y;\n" + nguoiky + ";\nThời gian ký: " + thoigian+";";
+                }
+                if(config.getSignatureType() != null && config.getSignatureType().equals("KY_SAOLUC")) {
+                    noidungky = "SAO LỤC;\n" + nguoiky + ";\nThời gian ký: " + thoigian+";";
+                }
+                if(config.getSignatureType() != null && config.getSignatureType().equals("KY_TRICKSAO")) {
+                    noidungky = "TRÍCH SAO;\n" + nguoiky + ";\nThời gian ký: " + thoigian+";";
+                }
+//                if(config.getSignatureType() != null && config.getSignatureType().equals("KY_SOHOA")) {
+//                    noidungky = "SỐ HÓA;\n" + nguoiky + ";\n" + thoigian+";";
+//                }
+                // END LOAI KY
+                System.out.println(noidungky);
+                ImageData signatureImage = ImageDataFactory.create(imageLogoPath);
+                if(config.getImgSignBase64() != null) {
+                    // convert base64 sang ImageData
+                    String dataImg = config.getImgSignBase64();
+                    String ext = "png"; // hardcode tạm thòi;
+                    String[] extArr = {"png"};
+                    if(!dataImg.isEmpty()) {
+                        signatureImage = SignHubUtill.convertBase64ToImageData(dataImg);
+                    }
+                }
+//                float width  = PDFUtil.scaleWidth(pageWidth, 5);
+//                float height = PDFUtil.scaleHeight(pageHeight, 4);
+                float width  = 180;
+                float height = 50;
+                if(!config.getLocationSign().isEmpty()) {
+                    LocationSignConvertXY locationSignConvertXY = new LocationSignConvertXY(config.getLocationSign(), pageHeight, pageWidth, height, width);
+                    xLocation = locationSignConvertXY.getxLocation();
+                    yLocation = locationSignConvertXY.getyLocation();
+                }
+
+                // convert tọa độ
+                PdfSigner.CryptoStandard cryptoStandard = PdfSigner.CryptoStandard.CMS;
+                if(config.getCryptoStandard().equalsIgnoreCase("CADES")) {
+                    cryptoStandard = PdfSigner.CryptoStandard.CADES;
+                }
+                Rectangle rect = new Rectangle(xLocation, yLocation, width, height);
+                //Rectangle rect = new Rectangle(xLocation, yLocation, width, height); // (x, y, width, height) - vị trí chữ ký trên trang PDF
+                PdfSignatureAppearance appearance = signer.getSignatureAppearance();
+                appearance.setReason("");
+                appearance.setLocation("");
+                appearance.setContact("");
+                appearance.setLayer2Text(noidungky);
+                appearance.setReuseAppearance(false);
+                appearance.setPageRect(rect);
+
+                // 0 = ImageAndInfo, 1 = Image, 2 = Info
+                if(showType == 1) {
+                    appearance.setSignatureGraphic(signatureImage);
+                    appearance.setRenderingMode(PdfSignatureAppearance.RenderingMode.GRAPHIC);
+                } else if(showType == 2) {
+                    appearance.setRenderingMode(PdfSignatureAppearance.RenderingMode.DESCRIPTION);
+                } else {
+                    appearance.setSignatureGraphic(signatureImage);
+                    appearance.setRenderingMode(PdfSignatureAppearance.RenderingMode.GRAPHIC_AND_DESCRIPTION);
+                }
+                appearance.setImageScale(-1); // Điều chỉnh tỷ lệ hình ảnh nếu cần
+
+                int fontSize = 7;
+                float resolution  = 300;
+//                float scaledFontSize = fontSize * (resolution / 72f);
+                appearance.setLayer2FontSize(fontSize);
+                PdfFont font = PdfFontFactory.createFont(urlfont);
+                appearance.setLayer2Font(font);
+                appearance.setPageNumber(pageSign);
+
+                signer.setFieldName("Signature");
+                IExternalSignature pks = new PrivateKeySignature(privateKey, DigestAlgorithms.SHA256, ConstantUtil.PROVIDER_NAME);
+                IExternalDigest digest = new BouncyCastleDigest();
+                signer.signDetached(digest, pks, chain, null, null, tsaClient, 0, cryptoStandard);
+                Security.removeProvider(ConstantUtil.PROVIDER_NAME);
+                //giải phóng bộ nhớ
+                reader.close();
 
                 System.out.println("Done Signing ...");
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * Check if a PDF document is PDF/A compliant
-     */
-    private static boolean isPdfADocument(File file) {
-        try {
-            PdfReader reader = new PdfReader(file);
-            PdfDocument testDoc = new PdfDocument(reader);
-
-            // Check for PDF/A metadata or other indicators
-            boolean isPdfA = testDoc.getCatalog().getPdfObject().getAsDictionary(PdfName.Metadata) != null;
-
-            // Additional check for PDF/A identifier in metadata
-            if (!isPdfA) {
-                PdfObject metadata = testDoc.getCatalog().getPdfObject().get(PdfName.Metadata);
-                if (metadata != null && metadata.isStream()) {
-                    // Could add more sophisticated PDF/A detection here
-                    isPdfA = true; // Conservative approach - treat as PDF/A if metadata exists
-                }
-            }
-
-            testDoc.close();
-            reader.close();
-            return isPdfA;
-        } catch (Exception e) {
-            // If we can't determine, assume it's regular PDF
-            return false;
-        }
-    }
-
-    /**
-     * Sign with PDF/A compliance using USB Token
-     */
-    private static void signWithPdfAComplianceUsbToken(File file, String signResult, ConfigSignature config,
-                                                       KeyStore keyStore, String alias, Certificate[] chain,
-                                                       PrivateKey privateKey) throws Exception {
-
-        PdfReader reader = new PdfReader(file);
-        PdfWriter writer = new PdfWriter(signResult);
-
-        // Use append mode to maintain PDF/A compliance
-        PdfSigner signer = new PdfSigner(reader, writer, new StampingProperties().useAppendMode());
-
-        PdfDocument pdfDoc = signer.getDocument();
-
-        // Get document properties
-        int numberOfPages = pdfDoc.getNumberOfPages();
-        float xLocation = config.getxLocation();
-        float yLocation = config.getyLocation();
-        int pageSign = config.getPageSign();
-
-        if(pageSign > numberOfPages) {
-            pageSign = numberOfPages;
-        }
-
-        float pageHeight = pdfDoc.getPage(pageSign).getPageSize().getHeight();
-        float pageWidth = pdfDoc.getPage(pageSign).getPageSize().getWidth();
-
-        // Get certificate information
-        Certificate certificate = keyStore.getCertificate(alias);
-        X509Certificate x509Certificate = (X509Certificate) certificate;
-        String[] arrSplit = x509Certificate.getSubjectDN().getName().split(",");
-
-        String coquan = arrSplit[3].replace("CN=", "") + ", " + arrSplit[4].replace("O=", "");
-        System.out.println("Certificate info: " + Arrays.stream(arrSplit).toList());
-
-        // Setup timestamp
-        String tsaUrl = config.getTimeStampServer();
-        TSAClientBouncyCastle tsaClient = new TSAClientBouncyCastle(tsaUrl, null, null);
-        Calendar signingDate = Calendar.getInstance();
-        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.ofHours(7));
-        DateTimeFormatter f = DateTimeFormatter.ofPattern("dd.MM.yyyy  HH:mm:ss XXX");
-        String thoigian = now.format(f);
-
-        String email = "";
-        try {
-            email = x509Certificate.getSubjectAlternativeNames().stream().toList().get(0).get(1).toString();
-        } catch (Exception e) {
-            email = ""; // Handle case where email is not available
-        }
-
-        String noidungky = coquan + "\n" + thoigian;
-
-        // Handle signature type
-        if(config.getSignatureType() != null && config.getSignatureType().equals("KY_SAOY")) {
-            noidungky = "SAO Y;\n" + email + ";\nThời gian ký: " + thoigian + ";";
-        }
-        if(config.getSignatureType() != null && config.getSignatureType().equals("KY_SAOLUC")) {
-            noidungky = "SAO LỤC;\n" + email + ";\nThời gian ký: " + thoigian + ";";
-        }
-        if(config.getSignatureType() != null && config.getSignatureType().equals("KY_TRICKSAO")) {
-            noidungky = "TRÍCH SAO;\n" + email + ";\nThời gian ký: " + thoigian + ";";
-        }
-
-        System.out.println("Signature content: " + noidungky);
-
-        float width = 180;
-        float height = 50;
-
-        if(!config.getLocationSign().isEmpty()) {
-            LocationSignConvertXY locationSignConvertXY = new LocationSignConvertXY(config.getLocationSign(), pageHeight, pageWidth, height, width);
-            xLocation = locationSignConvertXY.getxLocation();
-            yLocation = locationSignConvertXY.getyLocation();
-        }
-
-        // Configure signature appearance for PDF/A compatibility
-        PdfSigner.CryptoStandard cryptoStandard = PdfSigner.CryptoStandard.CMS;
-        if(config.getCryptoStandard().equalsIgnoreCase("CADES")) {
-            cryptoStandard = PdfSigner.CryptoStandard.CADES;
-        }
-
-        Rectangle rect = new Rectangle(xLocation, yLocation, width, height);
-        PdfSignatureAppearance appearance = signer.getSignatureAppearance();
-        appearance.setReason("");
-        appearance.setLocation("");
-        appearance.setContact("");
-        appearance.setLayer2Text(noidungky);
-        appearance.setReuseAppearance(false);
-        appearance.setPageRect(rect);
-
-        // For PDF/A compliance, avoid images with transparency
-        ShowSignature showSignature = config.getShowSignature();
-        int showType = showSignature.getShowType();
-
-        if(showType == 1) {
-            // If image is required, create PDF/A compatible image
-            try {
-                ImageData signatureImage = createPdfACompatibleImage(ConstantUtil.IDA_IMAGE_LOGO_URL);
-                appearance.setSignatureGraphic(signatureImage);
-                appearance.setRenderingMode(PdfSignatureAppearance.RenderingMode.GRAPHIC);
-            } catch (Exception e) {
-                // Fall back to text only if image fails
-                appearance.setRenderingMode(PdfSignatureAppearance.RenderingMode.DESCRIPTION);
-            }
-        } else if(showType == 2) {
-            appearance.setRenderingMode(PdfSignatureAppearance.RenderingMode.DESCRIPTION);
-        } else {
-            // For PDF/A safety, prefer text-only mode, but try image if needed
-            try {
-                ImageData signatureImage = createPdfACompatibleImage(ConstantUtil.IDA_IMAGE_LOGO_URL);
-                appearance.setSignatureGraphic(signatureImage);
-                appearance.setRenderingMode(PdfSignatureAppearance.RenderingMode.GRAPHIC_AND_DESCRIPTION);
-            } catch (Exception e) {
-                // Fall back to text only if image fails
-                appearance.setRenderingMode(PdfSignatureAppearance.RenderingMode.DESCRIPTION);
-            }
-        }
-
-        appearance.setImageScale(-1);
-
-        int fontSize = 7;
-        appearance.setLayer2FontSize(fontSize);
-        PdfFont font = PdfFontFactory.createFont(ConstantUtil.IDA_FONT_URL);
-        appearance.setLayer2Font(font);
-        appearance.setPageNumber(pageSign);
-
-        signer.setFieldName("Signature");
-        IExternalSignature pks = new PrivateKeySignature(privateKey, DigestAlgorithms.SHA256, ConstantUtil.PROVIDER_NAME);
-        IExternalDigest digest = new BouncyCastleDigest();
-        signer.signDetached(digest, pks, chain, null, null, tsaClient, 0, cryptoStandard);
-
-        Security.removeProvider(ConstantUtil.PROVIDER_NAME);
-        reader.close();
-    }
-
-    /**
-     * Sign regular PDF using USB Token
-     */
-    private static void signRegularPdfUsbToken(File file, String signResult, ConfigSignature config,
-                                               KeyStore keyStore, String alias, Certificate[] chain,
-                                               PrivateKey privateKey) throws Exception {
-
-        PdfReader reader = new PdfReader(file);
-        PdfWriter writer = new PdfWriter(signResult);
-        PdfSigner signer = new PdfSigner(reader, writer, new StampingProperties().useAppendMode());
-        PdfDocument pdfDoc = signer.getDocument();
-
-        // Get document properties
-        int numberOfPages = pdfDoc.getNumberOfPages();
-        float xLocation = config.getxLocation();
-        float yLocation = config.getyLocation();
-        int pageSign = config.getPageSign();
-
-        if(pageSign > numberOfPages) {
-            pageSign = numberOfPages;
-        }
-
-        float pageHeight = pdfDoc.getPage(pageSign).getPageSize().getHeight();
-        float pageWidth = pdfDoc.getPage(pageSign).getPageSize().getWidth();
-
-        // Get certificate information
-        Certificate certificate = keyStore.getCertificate(alias);
-        X509Certificate x509Certificate = (X509Certificate) certificate;
-        String[] arrSplit = x509Certificate.getSubjectDN().getName().split(",");
-
-        String coquan = arrSplit[3].replace("CN=", "") + ", " + arrSplit[4].replace("O=", "");
-        System.out.println("Certificate info: " + Arrays.stream(arrSplit).toList());
-
-        // Setup timestamp
-        String tsaUrl = config.getTimeStampServer();
-        TSAClientBouncyCastle tsaClient = new TSAClientBouncyCastle(tsaUrl, null, null);
-        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.ofHours(7));
-        DateTimeFormatter f = DateTimeFormatter.ofPattern("dd.MM.yyyy  HH:mm:ss XXX");
-        String thoigian = now.format(f);
-
-        String email = "";
-        try {
-            email = x509Certificate.getSubjectAlternativeNames().stream().toList().get(0).get(1).toString();
-        } catch (Exception e) {
-            email = ""; // Handle case where email is not available
-        }
-
-        String noidungky = coquan + "\n" + thoigian;
-
-        // Handle signature type
-        if(config.getSignatureType() != null && config.getSignatureType().equals("KY_SAOY")) {
-            noidungky = "SAO Y;\n" + email + ";\nThời gian ký: " + thoigian + ";";
-        }
-        if(config.getSignatureType() != null && config.getSignatureType().equals("KY_SAOLUC")) {
-            noidungky = "SAO LỤC;\n" + email + ";\nThời gian ký: " + thoigian + ";";
-        }
-        if(config.getSignatureType() != null && config.getSignatureType().equals("KY_TRICKSAO")) {
-            noidungky = "TRÍCH SAO;\n" + email + ";\nThời gian ký: " + thoigian + ";";
-        }
-
-        System.out.println("Signature content: " + noidungky);
-
-        // Create signature image (can use transparency in regular PDF)
-        ImageData signatureImage = ImageDataFactory.create(ConstantUtil.IDA_IMAGE_LOGO_URL);
-        if(config.getImgSignBase64() != null) {
-            String dataImg = config.getImgSignBase64();
-            if(!dataImg.isEmpty()) {
-                signatureImage = SignHubUtill.convertBase64ToImageData(dataImg);
-            }
-        }
-
-        float width = 180;
-        float height = 50;
-
-        if(!config.getLocationSign().isEmpty()) {
-            LocationSignConvertXY locationSignConvertXY = new LocationSignConvertXY(config.getLocationSign(), pageHeight, pageWidth, height, width);
-            xLocation = locationSignConvertXY.getxLocation();
-            yLocation = locationSignConvertXY.getyLocation();
-        }
-
-        // Configure signature appearance
-        PdfSigner.CryptoStandard cryptoStandard = PdfSigner.CryptoStandard.CMS;
-        if(config.getCryptoStandard().equalsIgnoreCase("CADES")) {
-            cryptoStandard = PdfSigner.CryptoStandard.CADES;
-        }
-
-        Rectangle rect = new Rectangle(xLocation, yLocation, width, height);
-        PdfSignatureAppearance appearance = signer.getSignatureAppearance();
-        appearance.setReason("");
-        appearance.setLocation("");
-        appearance.setContact("");
-        appearance.setLayer2Text(noidungky);
-        appearance.setReuseAppearance(false);
-        appearance.setPageRect(rect);
-
-        ShowSignature showSignature = config.getShowSignature();
-        int showType = showSignature.getShowType();
-
-        // Regular PDF can handle transparency without issues
-        if(showType == 1) {
-            appearance.setSignatureGraphic(signatureImage);
-            appearance.setRenderingMode(PdfSignatureAppearance.RenderingMode.GRAPHIC);
-        } else if(showType == 2) {
-            appearance.setRenderingMode(PdfSignatureAppearance.RenderingMode.DESCRIPTION);
-        } else {
-            appearance.setSignatureGraphic(signatureImage);
-            appearance.setRenderingMode(PdfSignatureAppearance.RenderingMode.GRAPHIC_AND_DESCRIPTION);
-        }
-
-        appearance.setImageScale(-1);
-
-        int fontSize = 7;
-        appearance.setLayer2FontSize(fontSize);
-        PdfFont font = PdfFontFactory.createFont(ConstantUtil.IDA_FONT_URL);
-        appearance.setLayer2Font(font);
-        appearance.setPageNumber(pageSign);
-
-        signer.setFieldName("Signature");
-        IExternalSignature pks = new PrivateKeySignature(privateKey, DigestAlgorithms.SHA256, ConstantUtil.PROVIDER_NAME);
-        IExternalDigest digest = new BouncyCastleDigest();
-        signer.signDetached(digest, pks, chain, null, null, tsaClient, 0, cryptoStandard);
-
-        Security.removeProvider(ConstantUtil.PROVIDER_NAME);
-        reader.close();
-    }
-
-    /**
-     * Creates a PDF/A compatible ImageData from a potentially transparent image
-     */
-    private static ImageData createPdfACompatibleImage(String imagePath) throws IOException {
-        try {
-            BufferedImage originalImage = ImageIO.read(new File(imagePath));
-
-            // Check if the image has transparency
-            boolean hasTransparency = originalImage.getColorModel().hasAlpha();
-
-            if (hasTransparency) {
-                // Remove transparency by compositing on white background
-                BufferedImage opaqueImage = new BufferedImage(
-                        originalImage.getWidth(),
-                        originalImage.getHeight(),
-                        BufferedImage.TYPE_INT_RGB
-                );
-
-                Graphics2D g2d = opaqueImage.createGraphics();
-                g2d.setColor(Color.WHITE);
-                g2d.fillRect(0, 0, opaqueImage.getWidth(), opaqueImage.getHeight());
-                g2d.drawImage(originalImage, 0, 0, null);
-                g2d.dispose();
-
-                // Convert to byte array and create ImageData
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                ImageIO.write(opaqueImage, "JPEG", baos);
-                return ImageDataFactory.create(baos.toByteArray());
-            } else {
-                // Image doesn't have transparency, use as-is
-                return ImageDataFactory.create(imagePath);
-            }
-        } catch (Exception e) {
-            // If image processing fails, throw exception to fall back to text-only
-            throw new IOException("Failed to process image for PDF/A compatibility: " + e.getMessage());
         }
     }
     public static JSONObject signPDFV2(File file, ConfigSignature config) {
