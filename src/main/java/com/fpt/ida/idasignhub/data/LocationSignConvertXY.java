@@ -48,7 +48,7 @@ public class LocationSignConvertXY {
         if(locationSign.equals("tren_trai")) {
             float x = 10 ; //cach le 20;
             float y = 10; //cach le 20
-            this.xLocation = widthObject + x;
+            this.xLocation = x;
             this.yLocation = heightPage - heightObject - y;
         }else if(locationSign.equals("tren_phai")) {
             float x = 10; //cach le 20;

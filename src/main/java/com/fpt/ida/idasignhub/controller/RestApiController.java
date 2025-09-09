@@ -491,6 +491,15 @@ public class RestApiController {
         return ResponseEntity.ok((JSONObject) rep);
     }
 
+    @PostMapping("/api/runAutoScanThuNghiem")
+    public ResponseEntity<JSONObject> runAutoScanThuNghiem() throws IOException {
+        SignHub.signPDFAutoThuNghiem();;
+        JSONObject rep  = new JSONObject();
+        rep.put("status", 200);
+        rep.put("message", "Kich hoạt autoScan");
+        return ResponseEntity.ok((JSONObject) rep);
+    }
+
     @PostMapping("/api/signPDFs")
     public ResponseEntity<JSONObject> signPDFs(
             @RequestParam(value = "xLocation", required = false) String xLocation,
